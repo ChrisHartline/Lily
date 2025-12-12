@@ -1,11 +1,12 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { Message } from '../types';
+import { config } from '../config';
 
-// WebSocket configuration
-const WS_URL = 'ws://localhost:8000/ws/chat';
-const RECONNECT_DELAY = 3000;
-const MAX_RECONNECT_ATTEMPTS = 5;
+// WebSocket configuration from config
+const WS_URL = config.ws.url;
+const RECONNECT_DELAY = config.ws.reconnectDelay;
+const MAX_RECONNECT_ATTEMPTS = config.ws.maxReconnectAttempts;
 
 // Message types from/to server
 interface ServerMessage {
@@ -302,7 +303,7 @@ export function useClaraChat(initialMessages: Message[] = []) {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         wsRef.current.send(JSON.stringify({ type: 'ping' }));
       }
-    }, 30000);
+    }, config.ws.pingInterval);
 
     return () => clearInterval(pingInterval);
   }, []);
