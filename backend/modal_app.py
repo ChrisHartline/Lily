@@ -18,7 +18,7 @@ Prerequisites:
 """
 
 import modal
-from modal import Image, App, asgi_app, Volume
+from modal import Image, App, asgi_app
 import os
 
 # === Modal Configuration ===
@@ -106,10 +106,6 @@ image = (
 # Create Modal app
 app = App(APP_NAME)
 
-# Volume for model cache persistence
-model_volume = Volume.from_name("clara-model-cache", create_if_missing=True)
-
-
 # === Clara Model Class ===
 
 @app.cls(
@@ -117,7 +113,6 @@ model_volume = Volume.from_name("clara-model-cache", create_if_missing=True)
     gpu="T4",  # Start with T4, upgrade to A10G if needed
     timeout=600,
     scaledown_window=300,
-    volumes={MODEL_CACHE_DIR: model_volume},
     secrets=[modal.Secret.from_name("huggingface-secret")],
 )
 class ClaraModel:
