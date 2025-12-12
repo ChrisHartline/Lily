@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { Message, View } from './types';
-import { useGeminiChat } from './hooks/useGeminiChat.ts';
+import { useClaraChat } from './hooks/useClaraChat.ts';
 import {
   ArrowLeftIcon, SettingsIcon, MicrophoneIcon, SendIcon, ChevronRightIcon, FolderIcon, PdfIcon, XlsIcon,
   PhotoIcon, DocumentIcon, AudioIcon, TtsIcon, SummarizeIcon, CameraIcon, VolumeIcon, ChatBubbleIcon
@@ -10,14 +10,8 @@ import {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: "Hello! I've analyzed the financial document you sent. The Q3 revenue shows a 15% increase. Would you like a detailed summary?",
+    text: "Hello! I'm Clara, your AI assistant with personality and memory. How can I help you today?",
     sender: 'assistant',
-  },
-  {
-    id: '2',
-    text: 'Yes, please focus on the breakdown of operational costs in the financial section.',
-    sender: 'user',
-    delivered: true,
   },
 ];
 
@@ -33,7 +27,7 @@ const ChatBackground = () => (
   />
 );
 
-const Header: React.FC<{ title: string; showBackButton: boolean; onBack: () => void; onSettings?: () => void; showSettingsButton?: boolean; }> = ({ title, showBackButton, onBack, onSettings, showSettingsButton = false }) => (
+const Header: React.FC<{ title: string; showBackButton: boolean; onBack: () => void; onSettings?: () => void; showSettingsButton?: boolean; isConnected?: boolean; claraAvailable?: boolean; }> = ({ title, showBackButton, onBack, onSettings, showSettingsButton = false, isConnected = false, claraAvailable = false }) => (
   <div className="relative z-10 flex items-center justify-between p-4 bg-aria-dark/80 backdrop-blur-sm border-b border-white/10 flex-shrink-0">
     {showBackButton ? (
       <button onClick={onBack} className="p-2 -ml-2" aria-label="Go back">
@@ -44,9 +38,11 @@ const Header: React.FC<{ title: string; showBackButton: boolean; onBack: () => v
     )}
     <div className="text-center">
       <h1 className="text-lg font-semibold text-white">{title}</h1>
-      {title === 'Aria' && <div className="flex items-center justify-center space-x-1.5">
-        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-        <p className="text-xs text-green-400">Online</p>
+      {title === 'Clara' && <div className="flex items-center justify-center space-x-1.5">
+        <div className={`w-2 h-2 rounded-full ${isConnected ? (claraAvailable ? 'bg-green-500' : 'bg-yellow-500') : 'bg-red-500'}`}></div>
+        <p className={`text-xs ${isConnected ? (claraAvailable ? 'text-green-400' : 'text-yellow-400') : 'text-red-400'}`}>
+          {isConnected ? (claraAvailable ? 'Online' : 'Lightweight') : 'Connecting...'}
+        </p>
       </div>}
     </div>
     {showSettingsButton ? (
@@ -73,7 +69,15 @@ const ToggleSwitch: React.FC<{ enabled: boolean; setEnabled: (e: boolean) => voi
 // --- View Components ---
 
 const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
-  const { messages, sendMessage, isTyping } = useGeminiChat(initialMessages);
+  const {
+    messages,
+    sendMessage,
+    isTyping,
+    isConnected,
+    claraAvailable,
+    speakLastMessage,
+    error
+  } = useClaraChat(initialMessages);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -90,31 +94,55 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
 
   return (
     <div className="flex flex-col h-full bg-aria-dark">
-      <Header title="Aria" showBackButton={false} onBack={() => {}} onSettings={() => setView('settings')} showSettingsButton={true} />
+      <Header
+        title="Clara"
+        showBackButton={false}
+        onBack={() => {}}
+        onSettings={() => setView('settings')}
+        showSettingsButton={true}
+        isConnected={isConnected}
+        claraAvailable={claraAvailable}
+      />
       <div className="flex-1 overflow-y-auto p-4 relative">
         <ChatBackground />
         <div className="relative z-10 flex flex-col space-y-4">
           <div className="flex justify-center my-8">
-            <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg" />
+            <img src="https://i.imgur.com/s22ZlE8.png" alt="Clara Avatar" className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg" />
           </div>
-          <div className="text-center text-xs text-aria-gray mb-4">Today, 10:23 AM</div>
+          <div className="text-center text-xs text-aria-gray mb-4">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+          </div>
+          {error && (
+            <div className="mx-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-300 text-sm text-center">
+              {error}
+            </div>
+          )}
           {messages.map((msg) => (
             <div key={msg.id} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.sender === 'assistant' && <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />}
+              {msg.sender === 'assistant' && <img src="https://i.imgur.com/s22ZlE8.png" alt="Clara Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />}
               <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${msg.sender === 'user' ? 'bg-aria-blue text-white rounded-br-lg' : 'bg-aria-dark-blue text-gray-200 rounded-bl-lg'}`}>
-                <p className="text-sm">{msg.text}</p>
+                <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                 {msg.sender === 'user' && msg.delivered && <p className="text-right text-xs text-blue-200 mt-1">Delivered</p>}
               </div>
+              {msg.sender === 'assistant' && (
+                <button
+                  onClick={speakLastMessage}
+                  className="p-1 text-aria-gray hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Speak message"
+                >
+                  <VolumeIcon className="w-4 h-4" />
+                </button>
+              )}
             </div>
           ))}
           {isTyping && (
             <div className="flex items-end gap-2 justify-start">
-              <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
+              <img src="https://i.imgur.com/s22ZlE8.png" alt="Clara Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
               <div className="bg-aria-dark-blue px-4 py-3 rounded-2xl rounded-bl-lg">
                 <div className="flex items-center space-x-1">
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-0"></span>
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-200"></span>
-                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-400"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse"></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></span>
+                  <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></span>
                 </div>
               </div>
             </div>
@@ -124,7 +152,7 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
       </div>
       <div className="p-4 bg-aria-dark/80 backdrop-blur-sm border-t border-white/10">
         <div className="flex items-center bg-aria-dark-blue rounded-full p-2">
-          <button className="p-2 text-aria-gray" aria-label="Voice input options">
+          <button className="p-2 text-aria-gray hover:text-white transition-colors" aria-label="Voice input options">
             <MicrophoneIcon className="w-6 h-6" />
           </button>
           <input
@@ -132,10 +160,16 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Message Aria..."
+            placeholder="Message Clara..."
             className="flex-1 bg-transparent text-white placeholder-aria-gray focus:outline-none px-2"
+            disabled={!isConnected}
           />
-          <button onClick={handleSend} className="w-10 h-10 rounded-full bg-aria-blue flex items-center justify-center text-white" aria-label="Send message">
+          <button
+            onClick={handleSend}
+            className={`w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors ${isConnected ? 'bg-aria-blue hover:bg-blue-500' : 'bg-gray-600 cursor-not-allowed'}`}
+            disabled={!isConnected}
+            aria-label="Send message"
+          >
             <SendIcon className="w-5 h-5" />
           </button>
         </div>
@@ -145,12 +179,35 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
 };
 
 const FilesView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
+  const { executeTool, isConnected } = useClaraChat([]);
+  const [summarizeText, setSummarizeText] = useState('');
+  const [ttsText, setTtsText] = useState('');
+  const [showSummarize, setShowSummarize] = useState(false);
+  const [showTts, setShowTts] = useState(false);
+
   const recentFiles = [
     { name: 'project_v1.jpg', icon: <FolderIcon className="w-12 h-12 text-yellow-500" />, specialBg: true },
     { name: 'Invoice_Oct.pdf', icon: <PdfIcon className="w-8 h-8 text-red-500" /> },
     { name: 'Q3_Data.xls', icon: <XlsIcon className="w-8 h-8 text-green-500" /> },
     { name: 'demo.mov', icon: <PhotoIcon className="w-8 h-8 text-purple-500" /> },
   ];
+
+  const handleSummarize = () => {
+    if (summarizeText.trim()) {
+      executeTool('summarize', { text: summarizeText, style: 'bullets' });
+      setSummarizeText('');
+      setShowSummarize(false);
+    }
+  };
+
+  const handleTts = () => {
+    if (ttsText.trim()) {
+      executeTool('text_to_speech', { text: ttsText });
+      setTtsText('');
+      setShowTts(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full bg-aria-dark text-white">
       <Header title="File & Tools Access" showBackButton={true} onBack={() => setView('chat')} />
@@ -158,8 +215,9 @@ const FilesView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
         <div className="bg-aria-dark-blue p-4 rounded-lg flex items-center gap-4">
           <img src="https://i.imgur.com/O5nC3A9.png" alt="Assistant Avatar" className="w-10 h-10 rounded-full" />
           <div>
-            <p className="text-xs text-aria-blue font-semibold">ASSISTANT</p>
+            <p className="text-xs text-aria-blue font-semibold">CLARA</p>
             <p className="text-sm">I can analyze files or run AI tools for you.</p>
+            {!isConnected && <p className="text-xs text-yellow-400 mt-1">Connecting to backend...</p>}
           </div>
         </div>
         <div>
@@ -216,7 +274,11 @@ const FilesView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
         <div>
           <h2 className="text-xs font-semibold text-aria-gray mb-2">AI TOOLS</h2>
           <div className="bg-aria-dark-blue rounded-lg">
-            <div className="flex items-center justify-between p-4 border-b border-white/10 cursor-pointer hover:bg-white/5">
+            {/* Text-to-Speech */}
+            <div
+              className="flex items-center justify-between p-4 border-b border-white/10 cursor-pointer hover:bg-white/5"
+              onClick={() => setShowTts(!showTts)}
+            >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-aria-blue rounded-lg flex items-center justify-center"><TtsIcon className="w-6 h-6" /></div>
                 <div>
@@ -224,9 +286,36 @@ const FilesView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
                   <p className="text-xs text-aria-gray">Convert text to natural audio</p>
                 </div>
               </div>
-              <ChevronRightIcon className="w-5 h-5 text-aria-gray" />
+              <ChevronRightIcon className={`w-5 h-5 text-aria-gray transition-transform ${showTts ? 'rotate-90' : ''}`} />
             </div>
-            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5">
+            {showTts && (
+              <div className="p-4 border-b border-white/10 bg-aria-dark/50">
+                <textarea
+                  value={ttsText}
+                  onChange={(e) => setTtsText(e.target.value)}
+                  placeholder="Enter text to convert to speech..."
+                  className="w-full bg-aria-dark border border-white/20 rounded-lg p-3 text-sm text-white placeholder-aria-gray focus:outline-none focus:border-aria-blue resize-none"
+                  rows={3}
+                />
+                <button
+                  onClick={handleTts}
+                  disabled={!isConnected || !ttsText.trim()}
+                  className={`mt-2 w-full py-2 rounded-lg font-medium transition-colors ${
+                    isConnected && ttsText.trim()
+                      ? 'bg-aria-blue hover:bg-blue-500 text-white'
+                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  Speak Text
+                </button>
+              </div>
+            )}
+
+            {/* Summarization */}
+            <div
+              className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5"
+              onClick={() => setShowSummarize(!showSummarize)}
+            >
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-aria-blue rounded-lg flex items-center justify-center"><SummarizeIcon className="w-6 h-6" /></div>
                 <div>
@@ -234,8 +323,30 @@ const FilesView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
                   <p className="text-xs text-aria-gray">Get quick summaries of long text</p>
                 </div>
               </div>
-              <ChevronRightIcon className="w-5 h-5 text-aria-gray" />
+              <ChevronRightIcon className={`w-5 h-5 text-aria-gray transition-transform ${showSummarize ? 'rotate-90' : ''}`} />
             </div>
+            {showSummarize && (
+              <div className="p-4 bg-aria-dark/50">
+                <textarea
+                  value={summarizeText}
+                  onChange={(e) => setSummarizeText(e.target.value)}
+                  placeholder="Paste text to summarize..."
+                  className="w-full bg-aria-dark border border-white/20 rounded-lg p-3 text-sm text-white placeholder-aria-gray focus:outline-none focus:border-aria-blue resize-none"
+                  rows={4}
+                />
+                <button
+                  onClick={handleSummarize}
+                  disabled={!isConnected || !summarizeText.trim()}
+                  className={`mt-2 w-full py-2 rounded-lg font-medium transition-colors ${
+                    isConnected && summarizeText.trim()
+                      ? 'bg-aria-blue hover:bg-blue-500 text-white'
+                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  Summarize
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

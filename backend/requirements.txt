@@ -1,0 +1,26 @@
+# FastAPI Backend
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+python-multipart>=0.0.6
+
+# Clara Dependencies
+sentence-transformers>=2.2.0
+numpy>=1.24.0
+torch>=2.0.0
+
+# Optional: Full Clara (comment out for lightweight mode)
+# transformers>=4.35.0
+# peft>=0.6.0
+# bitsandbytes>=0.41.0
+
+# Tools
+gtts>=2.4.0  # Text-to-speech
+httpx>=0.25.0  # Async HTTP for web search
+
+# Session Memory (optional)
+# falkordb>=1.0.0
+# redis>=5.0.0
+
+# Environment
+python-dotenv>=1.0.0
