@@ -74,9 +74,9 @@ def download_models():
 
 
 # Create the Modal image with all dependencies
-# Image version: 2 (force rebuild to download models with HF auth)
 image = (
     Image.debian_slim(python_version="3.11")
+    .env({"IMAGE_VERSION": "2"})  # Cache buster - increment to force rebuild
     .pip_install(
         # API
         "fastapi>=0.109.0",
