@@ -27,7 +27,7 @@ import os
 APP_NAME = "clara-api"
 
 # HuggingFace model repos
-HF_USERNAME = "ChrisHartline"
+HF_USERNAME = "ChrisSacrumCor"
 MODELS = {
     "knowledge": f"{HF_USERNAME}/clara-knowledge",      # Phi-3 knowledge brain (~7GB)
     "warmth": f"{HF_USERNAME}/clara-warmth",            # LoRA adapter
@@ -76,7 +76,7 @@ def download_models():
 # Create the Modal image with all dependencies
 image = (
     Image.debian_slim(python_version="3.11")
-    .env({"IMAGE_VERSION": "2"})  # Cache buster - increment to force rebuild
+    .env({"IMAGE_VERSION": "3"})  # Cache buster - increment to force rebuild
     .pip_install(
         # API
         "fastapi>=0.109.0",
