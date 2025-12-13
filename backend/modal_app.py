@@ -76,7 +76,7 @@ def download_models():
 # Create the Modal image with all dependencies
 image = (
     Image.debian_slim(python_version="3.11")
-    .env({"IMAGE_VERSION": "3"})  # Cache buster - increment to force rebuild
+    .env({"IMAGE_VERSION": "4"})  # Cache buster - increment to force rebuild
     .pip_install(
         # API
         "fastapi>=0.109.0",
@@ -86,7 +86,7 @@ image = (
 
         # ML/AI
         "torch>=2.1.0",
-        "transformers>=4.36.0",
+        "transformers>=4.44.0",  # Phi-3 requires 4.44+ for DynamicCache fix
         "accelerate>=0.25.0",
         "bitsandbytes>=0.41.0",
         "peft>=0.7.0",  # For LoRA
