@@ -76,7 +76,7 @@ def download_models():
 # Create the Modal image with all dependencies
 image = (
     Image.debian_slim(python_version="3.11")
-    .env({"IMAGE_VERSION": "4"})  # Cache buster - increment to force rebuild
+    .env({"IMAGE_VERSION": "5"})  # Cache buster - increment to force rebuild
     .pip_install(
         # API
         "fastapi>=0.109.0",
@@ -210,6 +210,7 @@ class ClaraModel:
                     temperature=0.7,
                     top_p=0.9,
                     do_sample=True,
+                    use_cache=False,  # Disable cache to avoid Phi-3 DynamicCache issues
                     pad_token_id=self.knowledge_tokenizer.eos_token_id,
                 )
 
