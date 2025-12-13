@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { Message, View } from './types';
-import { useGeminiChat } from './hooks/useGeminiChat.ts';
+import { useClaraChat } from './hooks/useClaraChat.ts';
 import {
   ArrowLeftIcon, SettingsIcon, MicrophoneIcon, SendIcon, ChevronRightIcon, FolderIcon, PdfIcon, XlsIcon,
   PhotoIcon, DocumentIcon, AudioIcon, TtsIcon, SummarizeIcon, CameraIcon, VolumeIcon, ChatBubbleIcon
@@ -10,14 +10,8 @@ import {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: "Hello! I've analyzed the financial document you sent. The Q3 revenue shows a 15% increase. Would you like a detailed summary?",
+    text: "Hello! I'm Clara, your warm and caring AI assistant. How can I help you today?",
     sender: 'assistant',
-  },
-  {
-    id: '2',
-    text: 'Yes, please focus on the breakdown of operational costs in the financial section.',
-    sender: 'user',
-    delivered: true,
   },
 ];
 
@@ -44,7 +38,7 @@ const Header: React.FC<{ title: string; showBackButton: boolean; onBack: () => v
     )}
     <div className="text-center">
       <h1 className="text-lg font-semibold text-white">{title}</h1>
-      {title === 'Aria' && <div className="flex items-center justify-center space-x-1.5">
+      {title === 'Clara' && <div className="flex items-center justify-center space-x-1.5">
         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
         <p className="text-xs text-green-400">Online</p>
       </div>}
@@ -73,7 +67,7 @@ const ToggleSwitch: React.FC<{ enabled: boolean; setEnabled: (e: boolean) => voi
 // --- View Components ---
 
 const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
-  const { messages, sendMessage, isTyping } = useGeminiChat(initialMessages);
+  const { messages, sendMessage, isTyping } = useClaraChat(initialMessages);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -90,17 +84,17 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
 
   return (
     <div className="flex flex-col h-full bg-aria-dark">
-      <Header title="Aria" showBackButton={false} onBack={() => {}} onSettings={() => setView('settings')} showSettingsButton={true} />
+      <Header title="Clara" showBackButton={false} onBack={() => {}} onSettings={() => setView('settings')} showSettingsButton={true} />
       <div className="flex-1 overflow-y-auto p-4 relative">
         <ChatBackground />
         <div className="relative z-10 flex flex-col space-y-4">
           <div className="flex justify-center my-8">
-            <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg" />
+            <img src="https://i.imgur.com/s22ZlE8.png" alt="Clara Avatar" className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg" />
           </div>
           <div className="text-center text-xs text-aria-gray mb-4">Today, 10:23 AM</div>
           {messages.map((msg) => (
             <div key={msg.id} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.sender === 'assistant' && <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />}
+              {msg.sender === 'assistant' && <img src="https://i.imgur.com/s22ZlE8.png" alt="Clara Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />}
               <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${msg.sender === 'user' ? 'bg-aria-blue text-white rounded-br-lg' : 'bg-aria-dark-blue text-gray-200 rounded-bl-lg'}`}>
                 <p className="text-sm">{msg.text}</p>
                 {msg.sender === 'user' && msg.delivered && <p className="text-right text-xs text-blue-200 mt-1">Delivered</p>}
@@ -109,7 +103,7 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
           ))}
           {isTyping && (
             <div className="flex items-end gap-2 justify-start">
-              <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
+              <img src="https://i.imgur.com/s22ZlE8.png" alt="Clara Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
               <div className="bg-aria-dark-blue px-4 py-3 rounded-2xl rounded-bl-lg">
                 <div className="flex items-center space-x-1">
                   <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-0"></span>
@@ -132,7 +126,7 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Message Aria..."
+            placeholder="Message Clara..."
             className="flex-1 bg-transparent text-white placeholder-aria-gray focus:outline-none px-2"
           />
           <button onClick={handleSend} className="w-10 h-10 rounded-full bg-aria-blue flex items-center justify-center text-white" aria-label="Send message">
