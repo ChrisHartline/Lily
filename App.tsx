@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import type { Message, View } from './types';
-import { useGeminiChat } from './hooks/useGeminiChat.ts';
+import { useClaraChat } from './hooks/useClaraChat.ts';
 import {
   ArrowLeftIcon, SettingsIcon, MicrophoneIcon, SendIcon, ChevronRightIcon, FolderIcon, PdfIcon, XlsIcon,
   PhotoIcon, DocumentIcon, AudioIcon, TtsIcon, SummarizeIcon, CameraIcon, VolumeIcon, ChatBubbleIcon
@@ -10,14 +10,8 @@ import {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: "Hello! I've analyzed the financial document you sent. The Q3 revenue shows a 15% increase. Would you like a detailed summary?",
+    text: "Hello! I'm Clara, your warm and caring AI assistant. How can I help you today?",
     sender: 'assistant',
-  },
-  {
-    id: '2',
-    text: 'Yes, please focus on the breakdown of operational costs in the financial section.',
-    sender: 'user',
-    delivered: true,
   },
 ];
 
@@ -44,7 +38,7 @@ const Header: React.FC<{ title: string; showBackButton: boolean; onBack: () => v
     )}
     <div className="text-center">
       <h1 className="text-lg font-semibold text-white">{title}</h1>
-      {title === 'Aria' && <div className="flex items-center justify-center space-x-1.5">
+      {title === 'Clara' && <div className="flex items-center justify-center space-x-1.5">
         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
         <p className="text-xs text-green-400">Online</p>
       </div>}
@@ -72,8 +66,8 @@ const ToggleSwitch: React.FC<{ enabled: boolean; setEnabled: (e: boolean) => voi
 
 // --- View Components ---
 
-const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
-  const { messages, sendMessage, isTyping } = useGeminiChat(initialMessages);
+const ChatView: React.FC<{ setView: (v: View) => void; avatarUrl: string; wallpaperUrl: string }> = ({ setView, avatarUrl, wallpaperUrl }) => {
+  const { messages, sendMessage, isTyping } = useClaraChat(initialMessages);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -90,17 +84,21 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
 
   return (
     <div className="flex flex-col h-full bg-aria-dark">
-      <Header title="Aria" showBackButton={false} onBack={() => {}} onSettings={() => setView('settings')} showSettingsButton={true} />
+      <Header title="Clara" showBackButton={false} onBack={() => {}} onSettings={() => setView('settings')} showSettingsButton={true} />
       <div className="flex-1 overflow-y-auto p-4 relative">
-        <ChatBackground />
+        {wallpaperUrl ? (
+          <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: `url("${wallpaperUrl}")` }} />
+        ) : (
+          <ChatBackground />
+        )}
         <div className="relative z-10 flex flex-col space-y-4">
           <div className="flex justify-center my-8">
-            <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg" />
+            <img src={avatarUrl} alt="Clara Avatar" className="w-24 h-24 rounded-full border-2 border-white/20 shadow-lg" />
           </div>
           <div className="text-center text-xs text-aria-gray mb-4">Today, 10:23 AM</div>
           {messages.map((msg) => (
             <div key={msg.id} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.sender === 'assistant' && <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />}
+              {msg.sender === 'assistant' && <img src={avatarUrl} alt="Clara Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />}
               <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${msg.sender === 'user' ? 'bg-aria-blue text-white rounded-br-lg' : 'bg-aria-dark-blue text-gray-200 rounded-bl-lg'}`}>
                 <p className="text-sm">{msg.text}</p>
                 {msg.sender === 'user' && msg.delivered && <p className="text-right text-xs text-blue-200 mt-1">Delivered</p>}
@@ -109,7 +107,7 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
           ))}
           {isTyping && (
             <div className="flex items-end gap-2 justify-start">
-              <img src="https://i.imgur.com/s22ZlE8.png" alt="Aria Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
+              <img src={avatarUrl} alt="Clara Avatar" className="w-8 h-8 rounded-full flex-shrink-0" />
               <div className="bg-aria-dark-blue px-4 py-3 rounded-2xl rounded-bl-lg">
                 <div className="flex items-center space-x-1">
                   <span className="w-2 h-2 bg-gray-400 rounded-full animate-pulse delay-0"></span>
@@ -132,7 +130,7 @@ const ChatView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Message Aria..."
+            placeholder="Message Clara..."
             className="flex-1 bg-transparent text-white placeholder-aria-gray focus:outline-none px-2"
           />
           <button onClick={handleSend} className="w-10 h-10 rounded-full bg-aria-blue flex items-center justify-center text-white" aria-label="Send message">
@@ -243,32 +241,92 @@ const FilesView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
   );
 };
 
-const SettingsView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => {
+type SettingsViewProps = {
+  setView: (v: View) => void;
+  avatarUrl: string;
+  setAvatarUrl: (url: string) => void;
+  wallpaperUrl: string;
+  setWallpaperUrl: (url: string) => void;
+  defaultAvatar: string;
+};
+
+const SettingsView: React.FC<SettingsViewProps> = ({ setView, avatarUrl, setAvatarUrl, wallpaperUrl, setWallpaperUrl, defaultAvatar }) => {
   const [voiceOutput, setVoiceOutput] = useState(true);
   const [hapticFeedback, setHapticFeedback] = useState(true);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const wallpaperInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>, setter: (url: string) => void) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setter(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-aria-dark text-white">
       <Header title="Settings" showBackButton={true} onBack={() => setView('chat')} />
       <div className="flex-1 overflow-y-auto p-4 space-y-8">
+        {/* Hidden file inputs */}
+        <input
+          type="file"
+          ref={avatarInputRef}
+          className="hidden"
+          accept="image/png,image/jpeg,image/jpg,image/gif"
+          onChange={(e) => handleFileSelect(e, setAvatarUrl)}
+        />
+        <input
+          type="file"
+          ref={wallpaperInputRef}
+          className="hidden"
+          accept="image/png,image/jpeg,image/jpg"
+          onChange={(e) => handleFileSelect(e, setWallpaperUrl)}
+        />
+
         <div>
           <h2 className="text-xs font-semibold text-aria-gray mb-2">AI PERSONA</h2>
           <div className="bg-aria-dark-blue rounded-lg p-6 text-center">
             <div className="relative inline-block">
-              <img src="https://i.imgur.com/dZ3Q8Fj.png" alt="Assistant Avatar" className="w-24 h-24 rounded-full mx-auto" />
-              <button className="absolute bottom-0 right-0 w-8 h-8 bg-aria-blue rounded-full flex items-center justify-center border-2 border-aria-dark-blue">
+              <img src={avatarUrl} alt="Assistant Avatar" className="w-24 h-24 rounded-full mx-auto object-cover" />
+              <button
+                onClick={() => avatarInputRef.current?.click()}
+                className="absolute bottom-0 right-0 w-8 h-8 bg-aria-blue rounded-full flex items-center justify-center border-2 border-aria-dark-blue"
+              >
                 <CameraIcon className="w-5 h-5 text-white" />
               </button>
             </div>
             <h3 className="text-lg font-semibold mt-4">Assistant Avatar</h3>
             <p className="text-sm text-aria-gray mt-1">Customize how your assistant looks in chat.</p>
-            <button className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 rounded-lg mt-4">Edit Photo</button>
+            <button
+              onClick={() => avatarInputRef.current?.click()}
+              className="w-full bg-white/10 hover:bg-white/20 text-white font-semibold py-2.5 rounded-lg mt-4"
+            >
+              Edit Photo
+            </button>
+            {avatarUrl !== defaultAvatar && (
+              <button
+                onClick={() => setAvatarUrl(defaultAvatar)}
+                className="w-full text-sm text-aria-gray hover:text-white mt-2"
+              >
+                Reset to Default
+              </button>
+            )}
           </div>
         </div>
         <div>
           <h2 className="text-xs font-semibold text-aria-gray mb-2">APPEARANCE</h2>
           <div className="bg-aria-dark-blue rounded-lg p-6">
-            <div className="h-32 rounded-lg bg-cover bg-center mb-4 relative overflow-hidden" style={{ backgroundImage: `url("https://i.imgur.com/8sC2TSy.png")` }}>
+            <div
+              className="h-32 rounded-lg bg-cover bg-center mb-4 relative overflow-hidden"
+              style={{
+                backgroundImage: wallpaperUrl ? `url("${wallpaperUrl}")` : `url("https://i.imgur.com/8sC2TSy.png")`,
+                backgroundColor: '#0A0E1A'
+              }}
+            >
               <div className="absolute inset-0 bg-black/30 p-2 flex flex-col justify-end space-y-2">
                 <div className="flex items-end gap-2 justify-start">
                   <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0"></div>
@@ -282,8 +340,18 @@ const SettingsView: React.FC<{ setView: (v: View) => void }> = ({ setView }) => 
             <h3 className="text-lg font-semibold">Chat Wallpaper</h3>
             <p className="text-sm text-aria-gray mt-1">Upload a .png or .jpg to customize your chat view.</p>
             <div className="flex items-center justify-between mt-4">
-              <button className="flex-1 bg-aria-blue hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg">Choose Wallpaper</button>
-              <button className="text-sm text-aria-gray ml-4">Reset</button>
+              <button
+                onClick={() => wallpaperInputRef.current?.click()}
+                className="flex-1 bg-aria-blue hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg"
+              >
+                Choose Wallpaper
+              </button>
+              <button
+                onClick={() => setWallpaperUrl('')}
+                className="text-sm text-aria-gray hover:text-white ml-4"
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -343,16 +411,22 @@ const BottomNavBar: React.FC<{ currentView: View; setView: (v: View) => void }> 
 
 // --- Main App Component ---
 
+// Default images
+const DEFAULT_AVATAR = "https://i.imgur.com/s22ZlE8.png";
+const DEFAULT_WALLPAPER = "";
+
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('chat');
+  const [avatarUrl, setAvatarUrl] = useState<string>(DEFAULT_AVATAR);
+  const [wallpaperUrl, setWallpaperUrl] = useState<string>(DEFAULT_WALLPAPER);
 
   return (
     <div className="bg-gray-900 min-h-screen flex items-center justify-center p-4 font-sans">
       <div className="w-full max-w-sm h-[90vh] max-h-[844px] bg-aria-dark rounded-[40px] shadow-2xl overflow-hidden relative flex flex-col border-4 border-gray-700">
         <div className="flex-1 overflow-hidden">
-          {currentView === 'chat' && <ChatView setView={setCurrentView} />}
+          {currentView === 'chat' && <ChatView setView={setCurrentView} avatarUrl={avatarUrl} wallpaperUrl={wallpaperUrl} />}
           {currentView === 'files' && <FilesView setView={setCurrentView} />}
-          {currentView === 'settings' && <SettingsView setView={setCurrentView} />}
+          {currentView === 'settings' && <SettingsView setView={setCurrentView} avatarUrl={avatarUrl} setAvatarUrl={setAvatarUrl} wallpaperUrl={wallpaperUrl} setWallpaperUrl={setWallpaperUrl} defaultAvatar={DEFAULT_AVATAR} />}
         </div>
         <BottomNavBar currentView={currentView} setView={setCurrentView} />
       </div>
