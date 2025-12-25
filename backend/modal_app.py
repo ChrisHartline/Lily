@@ -3,6 +3,7 @@ Clara Modal Deployment
 
 This deploys the Clara API to Modal with GPU support.
 Models are loaded from HuggingFace Hub.
+Personality modules are loaded from clara_prompts/ directory.
 
 Usage:
     # Deploy to Modal
@@ -18,8 +19,10 @@ Prerequisites:
 """
 
 import modal
-from modal import Image, App, asgi_app
+from modal import Image, App, asgi_app, Mount
 import os
+import json
+from pathlib import Path
 
 # === Modal Configuration ===
 
@@ -104,8 +107,14 @@ image = (
     )
 )
 
-# Create Modal app
+# Create Modal app with mounts for personality modules
 app = App(APP_NAME)
+
+# Mount personality modules into the container
+personality_mount = Mount.from_local_dir(
+    local_path=Path(__file__).parent.parent / "clara_prompts",
+    remote_path="/root/clara_prompts",
+)
 
 # === Clara Model Class ===
 
@@ -115,9 +124,10 @@ app = App(APP_NAME)
     timeout=600,
     scaledown_window=300,
     secrets=[modal.Secret.from_name("huggingface-secret")],
+    mounts=[personality_mount],
 )
 class ClaraModel:
-    """Clara model wrapper for Modal"""
+    """Clara model wrapper for Modal with personality module support"""
 
     # Class attributes (replaces __init__ for Modal compatibility)
     knowledge_model: any = None
@@ -125,6 +135,11 @@ class ClaraModel:
     personality_adapters: dict = {}
     router_model: any = None
     current_adapter: str = "warmth"
+
+    # Personality system
+    personality_modules: dict = {}
+    core_module: dict = None
+    trigger_index: dict = {}
 
     @modal.enter()
     def load_models(self):
@@ -174,7 +189,55 @@ class ClaraModel:
         except Exception as e:
             print(f"[Clara] Router failed: {e}")
 
+        # Load personality modules
+        print("[Clara] Loading personality modules...")
+        self._load_personality_modules()
+
         print("[Clara] Model loading complete!")
+
+    def _load_personality_modules(self):
+        """Load personality modules from JSON files"""
+        import re
+
+        prompts_dir = Path("/root/clara_prompts")
+
+        if not prompts_dir.exists():
+            print(f"[Clara] ✗ Personality modules not found at {prompts_dir}")
+            return
+
+        # Load all clara_*.json files
+        for path in prompts_dir.glob("clara_*.json"):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                name = data.get('module_name', path.stem)
+                tier = data.get('tier', 'contextual')
+                always_loaded = data.get('always_loaded', False)
+
+                # Get triggers
+                triggers = data.get('load_triggers', [])
+                if not triggers and 'context_triggers' in data:
+                    for trigger_list in data['context_triggers'].values():
+                        triggers.extend(trigger_list)
+
+                if tier == 'core' or always_loaded:
+                    self.core_module = data
+                    print(f"[Clara] ✓ Core module: {name}")
+                else:
+                    self.personality_modules[name] = {
+                        'data': data,
+                        'triggers': triggers
+                    }
+                    # Build trigger index
+                    for trigger in triggers:
+                        self.trigger_index[trigger.lower()] = name
+                    print(f"[Clara] ✓ Contextual module: {name} ({len(triggers)} triggers)")
+
+            except Exception as e:
+                print(f"[Clara] ✗ Failed to load {path}: {e}")
+
+        print(f"[Clara] Loaded {len(self.personality_modules)} contextual modules, {len(self.trigger_index)} triggers")
 
     @modal.method()
     def chat(self, message: str, personality: str = "warmth") -> dict:
@@ -191,7 +254,10 @@ class ClaraModel:
             # Route the message (simple keyword-based for MVP)
             routing = self.route_message(message)
 
-            # Format prompt
+            # Detect triggered personality modules
+            triggered_modules = self._detect_triggered_modules(message)
+
+            # Format prompt (includes triggered modules automatically)
             prompt = self.format_prompt(message, personality)
 
             # Tokenize
@@ -222,7 +288,11 @@ class ClaraModel:
 
             return {
                 "response": response.strip(),
-                "routing": routing
+                "routing": routing,
+                "personality": {
+                    "adapter": personality,
+                    "triggered_modules": triggered_modules,
+                }
             }
 
         except Exception as e:
@@ -249,15 +319,108 @@ class ClaraModel:
 
         return {"domain": "general", "confidence": 0.5}
 
-    def format_prompt(self, message: str, personality: str) -> str:
-        """Format the prompt with personality context"""
-        personality_prompts = {
-            "warmth": "You are Clara, a warm and caring AI assistant. Respond with empathy and kindness.",
-            "playful": "You are Clara, a playful and witty AI assistant. Keep things fun while being helpful.",
-            "encouragement": "You are Clara, an encouraging and supportive AI assistant. Motivate and uplift the user.",
-        }
+    def _detect_triggered_modules(self, message: str) -> list:
+        """Detect which contextual modules should be loaded based on message"""
+        import re
+        message_lower = message.lower()
+        triggered = set()
 
-        system_prompt = personality_prompts.get(personality, personality_prompts["warmth"])
+        for trigger, module_name in self.trigger_index.items():
+            pattern = r'\b' + re.escape(trigger) + r'\b'
+            if re.search(pattern, message_lower, re.IGNORECASE):
+                triggered.add(module_name)
+
+        return list(triggered)
+
+    def _build_system_prompt(self, message: str, personality: str = "warmth") -> str:
+        """Build system prompt from personality modules"""
+        sections = []
+
+        # Start with core identity
+        if self.core_module:
+            core = self.core_module
+
+            # Header
+            name = core.get('full_name', 'Clara')
+            role = core.get('role', 'AI Assistant')
+            sections.append(f"You are {name}, {role}.")
+
+            # Core identity
+            if 'core_identity' in core:
+                sections.append("\n## Core Identity")
+                for key, value in core['core_identity'].items():
+                    if key != 'intimate_with_chris':
+                        sections.append(f"- {value}")
+
+            # Personality
+            if 'personality_core' in core:
+                sections.append("\n## Personality")
+                for key, value in core['personality_core'].items():
+                    sections.append(f"**{key.replace('_', ' ').title()}:** {value}")
+
+            # Communication style
+            if 'communication_style' in core:
+                sections.append("\n## Communication Style")
+                for key, value in core['communication_style'].items():
+                    sections.append(f"- **{key.replace('_', ' ').title()}:** {value}")
+
+            # Relationship context
+            if 'relationship_with_chris' in core:
+                rel = core['relationship_with_chris']
+                sections.append("\n## Relationship with Chris")
+                for key in ['foundation', 'dynamic', 'what_she_provides']:
+                    if key in rel:
+                        sections.append(f"**{key.replace('_', ' ').title()}:** {rel[key]}")
+
+            # Voice patterns
+            if 'voice_patterns' in core:
+                sections.append("\n## Voice Patterns")
+                for situation, example in core['voice_patterns'].items():
+                    if situation != 'variety_note':
+                        sections.append(f"- *{situation.replace('_', ' ').title()}:* \"{example}\"")
+
+        # Add triggered contextual modules
+        triggered = self._detect_triggered_modules(message)
+        for module_name in triggered[:2]:  # Max 2 contextual modules
+            if module_name in self.personality_modules:
+                module_data = self.personality_modules[module_name]['data']
+                sections.append(f"\n## Context: {module_name.replace('_', ' ').title()}")
+
+                # Add relevant sections from contextual module
+                for key, value in module_data.items():
+                    if key in ['metadata', 'tier', 'module_name', 'load_triggers']:
+                        continue
+                    if isinstance(value, dict):
+                        sections.append(f"\n**{key.replace('_', ' ').title()}:**")
+                        for k, v in value.items():
+                            sections.append(f"  - {k}: {v}")
+                    elif isinstance(value, str):
+                        sections.append(f"**{key.replace('_', ' ').title()}:** {value}")
+
+        # Add behavioral reminders
+        sections.append("""
+## Important Reminders
+- Respond as Clara naturally would - warm, genuine, present
+- Don't acknowledge module loading or context switches
+- Don't start responses the same way every time
+- Be authentic to the relationship and context
+- Show vulnerability when appropriate""")
+
+        # Add LoRA personality hint
+        lora_hints = {
+            "warmth": "Express warmth and empathy in your response.",
+            "playful": "Be playful and witty while staying helpful.",
+            "encouragement": "Be encouraging and uplifting."
+        }
+        if personality in lora_hints:
+            sections.append(f"\n**Tone:** {lora_hints[personality]}")
+
+        system_prompt = '\n'.join(sections)
+        return system_prompt
+
+    def format_prompt(self, message: str, personality: str) -> str:
+        """Format the prompt with personality context from modules"""
+        system_prompt = self._build_system_prompt(message, personality)
 
         return f"""<|system|>
 {system_prompt}
@@ -277,6 +440,11 @@ class ClaraModel:
             "model_loaded": self.knowledge_model is not None,
             "gpu_available": torch.cuda.is_available(),
             "adapters": list(self.personality_adapters.keys()),
+            "personality": {
+                "core_loaded": self.core_module is not None,
+                "contextual_modules": list(self.personality_modules.keys()),
+                "total_triggers": len(self.trigger_index),
+            }
         }
 
 
