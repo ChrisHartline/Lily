@@ -20,6 +20,9 @@ from .quantum_consolidation import (
     get_consolidation_engine,
     QUANTUM_AVAILABLE
 )
+from .postgres_store import PostgresMemoryStore, POSTGRES_AVAILABLE
+from .falkor_store import FalkorMemoryStore, Entity, Relationship, FALKOR_AVAILABLE
+from .integrated_memory import IntegratedMemory, RecallResult, create_memory_system
 
 __all__ = [
     # Base interfaces
@@ -36,4 +39,16 @@ __all__ = [
     'ClassicalQuantumFallback',
     'get_consolidation_engine',
     'QUANTUM_AVAILABLE',
+    # PostgreSQL store
+    'PostgresMemoryStore',
+    'POSTGRES_AVAILABLE',
+    # FalkorDB store
+    'FalkorMemoryStore',
+    'Entity',
+    'Relationship',
+    'FALKOR_AVAILABLE',
+    # Integrated memory
+    'IntegratedMemory',
+    'RecallResult',
+    'create_memory_system',
 ]

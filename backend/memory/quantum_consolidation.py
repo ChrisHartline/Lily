@@ -106,7 +106,7 @@ class QuantumConsolidation(ConsolidationEngine):
         # Simulator for local execution
         self.simulator = cirq.Simulator()
 
-    def _create_symbols(self) -> List[sympy.Symbol]:
+    def _create_symbols(self) -> List:
         """Create symbolic parameters for variational circuit."""
         symbols = []
         for layer in range(self.n_layers):
@@ -115,7 +115,7 @@ class QuantumConsolidation(ConsolidationEngine):
                 symbols.append(sympy.Symbol(f'phi_{layer}_{qubit}'))
         return symbols
 
-    def _build_consolidation_circuit(self) -> cirq.Circuit:
+    def _build_consolidation_circuit(self):
         """
         Build variational quantum circuit for memory consolidation.
 
@@ -147,11 +147,11 @@ class QuantumConsolidation(ConsolidationEngine):
 
         return circuit
 
-    def _build_readout_operators(self) -> List[cirq.PauliString]:
+    def _build_readout_operators(self) -> List:
         """Build Pauli Z operators for measuring each qubit."""
         return [cirq.Z(q) for q in self.qubits]
 
-    def _build_hybrid_model(self) -> tf.keras.Model:
+    def _build_hybrid_model(self):
         """
         Build hybrid quantum-classical model for consolidation learning.
 
@@ -257,7 +257,7 @@ class QuantumConsolidation(ConsolidationEngine):
     def encode_memory_batch(
         self,
         memories: List[Memory]
-    ) -> cirq.Circuit:
+    ):
         """
         Encode a batch of memories into quantum state.
 
