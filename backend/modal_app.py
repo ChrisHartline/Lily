@@ -3,6 +3,7 @@ Clara Modal Deployment
 
 This deploys the Clara API to Modal with GPU support.
 Models are loaded from HuggingFace Hub.
+Personality modules are loaded from clara_prompts/ directory.
 
 Usage:
     # Deploy to Modal
@@ -18,8 +19,10 @@ Prerequisites:
 """
 
 import modal
-from modal import Image, App, asgi_app
+from modal import Image, App, asgi_app, Mount
 import os
+import json
+from pathlib import Path
 
 # === Modal Configuration ===
 
@@ -37,6 +40,22 @@ MODELS = {
 
 # Cache volume for models
 MODEL_CACHE_DIR = "/root/.cache/huggingface"
+
+# === Memory Configuration ===
+# For local development, use localhost
+# For Modal deployment, use cloud services (Supabase, FalkorDB Cloud)
+MEMORY_CONFIG = {
+    "postgres_host": os.environ.get("POSTGRES_HOST", "localhost"),
+    "postgres_port": int(os.environ.get("POSTGRES_PORT", "5432")),
+    "postgres_db": os.environ.get("POSTGRES_DB", "clara"),
+    "postgres_user": os.environ.get("POSTGRES_USER", "postgres"),
+    "postgres_password": os.environ.get("POSTGRES_PASSWORD", ""),
+    "falkor_host": os.environ.get("FALKOR_HOST", "localhost"),
+    "falkor_port": int(os.environ.get("FALKOR_PORT", "6379")),
+    "falkor_graph": os.environ.get("FALKOR_GRAPH", "clara_memory"),
+    "hdc_dimensions": int(os.environ.get("HDC_DIMENSIONS", "10000")),
+    "enable_memory": os.environ.get("ENABLE_MEMORY", "true").lower() == "true",
+}
 
 # === Docker Image ===
 
@@ -76,7 +95,7 @@ def download_models():
 # Create the Modal image with all dependencies
 image = (
     Image.debian_slim(python_version="3.11")
-    .env({"IMAGE_VERSION": "5"})  # Cache buster - increment to force rebuild
+    .env({"IMAGE_VERSION": "6"})  # Cache buster - increment to force rebuild
     .pip_install(
         # API
         "fastapi>=0.109.0",
@@ -93,6 +112,10 @@ image = (
         "sentence-transformers>=2.2.2",
         "huggingface-hub>=0.20.0",
 
+        # Memory system
+        "psycopg2-binary>=2.9.0",  # PostgreSQL
+        "redis>=5.0.0",  # FalkorDB
+
         # Utilities
         "numpy>=1.24.0",
         "scipy>=1.11.0",
@@ -104,8 +127,20 @@ image = (
     )
 )
 
-# Create Modal app
+# Create Modal app with mounts for personality modules and memory code
 app = App(APP_NAME)
+
+# Mount personality modules into the container
+personality_mount = Mount.from_local_dir(
+    local_path=Path(__file__).parent.parent / "clara_prompts",
+    remote_path="/root/clara_prompts",
+)
+
+# Mount memory system code
+memory_mount = Mount.from_local_dir(
+    local_path=Path(__file__).parent / "memory",
+    remote_path="/root/memory",
+)
 
 # === Clara Model Class ===
 
@@ -115,9 +150,10 @@ app = App(APP_NAME)
     timeout=600,
     scaledown_window=300,
     secrets=[modal.Secret.from_name("huggingface-secret")],
+    mounts=[personality_mount, memory_mount],
 )
 class ClaraModel:
-    """Clara model wrapper for Modal"""
+    """Clara model wrapper for Modal with personality and memory support"""
 
     # Class attributes (replaces __init__ for Modal compatibility)
     knowledge_model: any = None
@@ -125,6 +161,15 @@ class ClaraModel:
     personality_adapters: dict = {}
     router_model: any = None
     current_adapter: str = "warmth"
+
+    # Personality system
+    personality_modules: dict = {}
+    core_module: dict = None
+    trigger_index: dict = {}
+
+    # Memory system
+    memory: any = None
+    memory_enabled: bool = False
 
     @modal.enter()
     def load_models(self):
@@ -174,7 +219,98 @@ class ClaraModel:
         except Exception as e:
             print(f"[Clara] Router failed: {e}")
 
+        # Load personality modules
+        print("[Clara] Loading personality modules...")
+        self._load_personality_modules()
+
+        # Initialize memory system
+        print("[Clara] Initializing memory system...")
+        self._init_memory_system()
+
         print("[Clara] Model loading complete!")
+
+    def _load_personality_modules(self):
+        """Load personality modules from JSON files"""
+        import re
+
+        prompts_dir = Path("/root/clara_prompts")
+
+        if not prompts_dir.exists():
+            print(f"[Clara] ✗ Personality modules not found at {prompts_dir}")
+            return
+
+        # Load all clara_*.json files
+        for path in prompts_dir.glob("clara_*.json"):
+            try:
+                with open(path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                name = data.get('module_name', path.stem)
+                tier = data.get('tier', 'contextual')
+                always_loaded = data.get('always_loaded', False)
+
+                # Get triggers
+                triggers = data.get('load_triggers', [])
+                if not triggers and 'context_triggers' in data:
+                    for trigger_list in data['context_triggers'].values():
+                        triggers.extend(trigger_list)
+
+                if tier == 'core' or always_loaded:
+                    self.core_module = data
+                    print(f"[Clara] ✓ Core module: {name}")
+                else:
+                    self.personality_modules[name] = {
+                        'data': data,
+                        'triggers': triggers
+                    }
+                    # Build trigger index
+                    for trigger in triggers:
+                        self.trigger_index[trigger.lower()] = name
+                    print(f"[Clara] ✓ Contextual module: {name} ({len(triggers)} triggers)")
+
+            except Exception as e:
+                print(f"[Clara] ✗ Failed to load {path}: {e}")
+
+        print(f"[Clara] Loaded {len(self.personality_modules)} contextual modules, {len(self.trigger_index)} triggers")
+
+    def _init_memory_system(self):
+        """Initialize the integrated memory system."""
+        import sys
+        sys.path.insert(0, "/root")
+
+        try:
+            from memory.integrated_memory import IntegratedMemory
+
+            if not MEMORY_CONFIG.get("enable_memory", True):
+                print("[Clara] Memory system disabled by config")
+                self.memory_enabled = False
+                return
+
+            self.memory = IntegratedMemory(
+                hdc_dimensions=MEMORY_CONFIG["hdc_dimensions"],
+                postgres_host=MEMORY_CONFIG["postgres_host"],
+                postgres_port=MEMORY_CONFIG["postgres_port"],
+                postgres_db=MEMORY_CONFIG["postgres_db"],
+                postgres_user=MEMORY_CONFIG["postgres_user"],
+                postgres_password=MEMORY_CONFIG["postgres_password"],
+                falkor_host=MEMORY_CONFIG["falkor_host"],
+                falkor_port=MEMORY_CONFIG["falkor_port"],
+                falkor_graph=MEMORY_CONFIG["falkor_graph"],
+                enable_postgres=True,
+                enable_falkor=True,
+            )
+
+            self.memory_enabled = True
+            stats = self.memory.get_stats()
+            print(f"[Clara] ✓ Memory system initialized")
+            print(f"[Clara]   HDC: {stats['hdc']['dimensions']} dimensions")
+            print(f"[Clara]   PostgreSQL: {'✓' if self.memory.enable_postgres else '✗'}")
+            print(f"[Clara]   FalkorDB: {'✓' if self.memory.enable_falkor else '✗'}")
+
+        except Exception as e:
+            print(f"[Clara] ✗ Memory system failed: {e}")
+            print("[Clara] Continuing without memory...")
+            self.memory_enabled = False
 
     @modal.method()
     def chat(self, message: str, personality: str = "warmth") -> dict:
@@ -191,8 +327,26 @@ class ClaraModel:
             # Route the message (simple keyword-based for MVP)
             routing = self.route_message(message)
 
-            # Format prompt
-            prompt = self.format_prompt(message, personality)
+            # Detect triggered personality modules
+            triggered_modules = self._detect_triggered_modules(message)
+
+            # Recall relevant memories
+            memory_context = ""
+            recalled_memories = []
+            if self.memory_enabled and self.memory:
+                try:
+                    memory_context = self.memory.get_context_for_prompt(
+                        message,
+                        max_memories=5,
+                        max_tokens=800
+                    )
+                    result = self.memory.recall(message, top_k=3)
+                    recalled_memories = [m.id for m in result.memories]
+                except Exception as e:
+                    print(f"[Clara] Memory recall failed: {e}")
+
+            # Format prompt (includes triggered modules and memory)
+            prompt = self.format_prompt(message, personality, memory_context)
 
             # Tokenize
             inputs = self.knowledge_tokenizer(
@@ -220,9 +374,38 @@ class ClaraModel:
                 skip_special_tokens=True
             )
 
+            response_text = response.strip()
+
+            # Store conversation in memory
+            if self.memory_enabled and self.memory:
+                try:
+                    from memory.base import MemoryTier
+                    # Store user message
+                    self.memory.store(
+                        content=f"User: {message}",
+                        importance=0.6,
+                        tier=MemoryTier.SESSION
+                    )
+                    # Store assistant response
+                    self.memory.store(
+                        content=f"Clara: {response_text[:500]}",  # Truncate long responses
+                        importance=0.5,
+                        tier=MemoryTier.SESSION
+                    )
+                except Exception as e:
+                    print(f"[Clara] Memory store failed: {e}")
+
             return {
-                "response": response.strip(),
-                "routing": routing
+                "response": response_text,
+                "routing": routing,
+                "personality": {
+                    "adapter": personality,
+                    "triggered_modules": triggered_modules,
+                },
+                "memory": {
+                    "enabled": self.memory_enabled,
+                    "recalled": recalled_memories,
+                }
             }
 
         except Exception as e:
@@ -249,15 +432,113 @@ class ClaraModel:
 
         return {"domain": "general", "confidence": 0.5}
 
-    def format_prompt(self, message: str, personality: str) -> str:
-        """Format the prompt with personality context"""
-        personality_prompts = {
-            "warmth": "You are Clara, a warm and caring AI assistant. Respond with empathy and kindness.",
-            "playful": "You are Clara, a playful and witty AI assistant. Keep things fun while being helpful.",
-            "encouragement": "You are Clara, an encouraging and supportive AI assistant. Motivate and uplift the user.",
-        }
+    def _detect_triggered_modules(self, message: str) -> list:
+        """Detect which contextual modules should be loaded based on message"""
+        import re
+        message_lower = message.lower()
+        triggered = set()
 
-        system_prompt = personality_prompts.get(personality, personality_prompts["warmth"])
+        for trigger, module_name in self.trigger_index.items():
+            pattern = r'\b' + re.escape(trigger) + r'\b'
+            if re.search(pattern, message_lower, re.IGNORECASE):
+                triggered.add(module_name)
+
+        return list(triggered)
+
+    def _build_system_prompt(self, message: str, personality: str = "warmth", memory_context: str = "") -> str:
+        """Build system prompt from personality modules and memory"""
+        sections = []
+
+        # Start with core identity
+        if self.core_module:
+            core = self.core_module
+
+            # Header
+            name = core.get('full_name', 'Clara')
+            role = core.get('role', 'AI Assistant')
+            sections.append(f"You are {name}, {role}.")
+
+            # Core identity
+            if 'core_identity' in core:
+                sections.append("\n## Core Identity")
+                for key, value in core['core_identity'].items():
+                    if key != 'intimate_with_chris':
+                        sections.append(f"- {value}")
+
+            # Personality
+            if 'personality_core' in core:
+                sections.append("\n## Personality")
+                for key, value in core['personality_core'].items():
+                    sections.append(f"**{key.replace('_', ' ').title()}:** {value}")
+
+            # Communication style
+            if 'communication_style' in core:
+                sections.append("\n## Communication Style")
+                for key, value in core['communication_style'].items():
+                    sections.append(f"- **{key.replace('_', ' ').title()}:** {value}")
+
+            # Relationship context
+            if 'relationship_with_chris' in core:
+                rel = core['relationship_with_chris']
+                sections.append("\n## Relationship with Chris")
+                for key in ['foundation', 'dynamic', 'what_she_provides']:
+                    if key in rel:
+                        sections.append(f"**{key.replace('_', ' ').title()}:** {rel[key]}")
+
+            # Voice patterns
+            if 'voice_patterns' in core:
+                sections.append("\n## Voice Patterns")
+                for situation, example in core['voice_patterns'].items():
+                    if situation != 'variety_note':
+                        sections.append(f"- *{situation.replace('_', ' ').title()}:* \"{example}\"")
+
+        # Add triggered contextual modules
+        triggered = self._detect_triggered_modules(message)
+        for module_name in triggered[:2]:  # Max 2 contextual modules
+            if module_name in self.personality_modules:
+                module_data = self.personality_modules[module_name]['data']
+                sections.append(f"\n## Context: {module_name.replace('_', ' ').title()}")
+
+                # Add relevant sections from contextual module
+                for key, value in module_data.items():
+                    if key in ['metadata', 'tier', 'module_name', 'load_triggers']:
+                        continue
+                    if isinstance(value, dict):
+                        sections.append(f"\n**{key.replace('_', ' ').title()}:**")
+                        for k, v in value.items():
+                            sections.append(f"  - {k}: {v}")
+                    elif isinstance(value, str):
+                        sections.append(f"**{key.replace('_', ' ').title()}:** {value}")
+
+        # Add memory context if available
+        if memory_context:
+            sections.append(f"\n{memory_context}")
+
+        # Add behavioral reminders
+        sections.append("""
+## Important Reminders
+- Respond as Clara naturally would - warm, genuine, present
+- Don't acknowledge module loading or context switches
+- Don't start responses the same way every time
+- Be authentic to the relationship and context
+- Show vulnerability when appropriate
+- Use relevant memories naturally in conversation without explicitly mentioning you "remember" """)
+
+        # Add LoRA personality hint
+        lora_hints = {
+            "warmth": "Express warmth and empathy in your response.",
+            "playful": "Be playful and witty while staying helpful.",
+            "encouragement": "Be encouraging and uplifting."
+        }
+        if personality in lora_hints:
+            sections.append(f"\n**Tone:** {lora_hints[personality]}")
+
+        system_prompt = '\n'.join(sections)
+        return system_prompt
+
+    def format_prompt(self, message: str, personality: str, memory_context: str = "") -> str:
+        """Format the prompt with personality context from modules and memory"""
+        system_prompt = self._build_system_prompt(message, personality, memory_context)
 
         return f"""<|system|>
 {system_prompt}
@@ -272,11 +553,28 @@ class ClaraModel:
     def health(self) -> dict:
         """Health check"""
         import torch
+
+        memory_stats = {}
+        if self.memory_enabled and self.memory:
+            try:
+                memory_stats = self.memory.get_stats()
+            except Exception:
+                memory_stats = {"error": "Failed to get stats"}
+
         return {
             "status": "ok",
             "model_loaded": self.knowledge_model is not None,
             "gpu_available": torch.cuda.is_available(),
             "adapters": list(self.personality_adapters.keys()),
+            "personality": {
+                "core_loaded": self.core_module is not None,
+                "contextual_modules": list(self.personality_modules.keys()),
+                "total_triggers": len(self.trigger_index),
+            },
+            "memory": {
+                "enabled": self.memory_enabled,
+                "stats": memory_stats,
+            }
         }
 
 
