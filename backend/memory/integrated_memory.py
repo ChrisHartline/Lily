@@ -60,6 +60,7 @@ class IntegratedMemory:
         falkor_host: str = "localhost",
         falkor_port: int = 6379,
         falkor_graph: str = "clara_memory",
+        falkor_password: str = None,
         # Feature flags
         enable_postgres: bool = True,
         enable_falkor: bool = True,
@@ -107,6 +108,7 @@ class IntegratedMemory:
                     host=falkor_host,
                     port=falkor_port,
                     graph_name=falkor_graph,
+                    password=falkor_password,
                 )
             except Exception as e:
                 print(f"[IntegratedMemory] FalkorDB disabled: {e}")

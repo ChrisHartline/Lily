@@ -52,7 +52,8 @@ MEMORY_CONFIG = {
     "postgres_password": os.environ.get("POSTGRES_PASSWORD", ""),
     "falkor_host": os.environ.get("FALKOR_HOST", "localhost"),
     "falkor_port": int(os.environ.get("FALKOR_PORT", "6379")),
-    "falkor_graph": os.environ.get("FALKOR_GRAPH", "clara_memory"),
+    "falkor_graph": os.environ.get("FALKOR_GRAPH", "claralilymem"),
+    "falkor_password": os.environ.get("FALKOR_PASSWORD", ""),
     "hdc_dimensions": int(os.environ.get("HDC_DIMENSIONS", "10000")),
     "enable_memory": os.environ.get("ENABLE_MEMORY", "true").lower() == "true",
 }
@@ -296,6 +297,7 @@ class ClaraModel:
                 falkor_host=MEMORY_CONFIG["falkor_host"],
                 falkor_port=MEMORY_CONFIG["falkor_port"],
                 falkor_graph=MEMORY_CONFIG["falkor_graph"],
+                falkor_password=MEMORY_CONFIG["falkor_password"],
                 enable_postgres=True,
                 enable_falkor=True,
             )
