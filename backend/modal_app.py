@@ -150,7 +150,11 @@ memory_mount = Mount.from_local_dir(
     gpu="T4",  # Start with T4, upgrade to A10G if needed
     timeout=600,
     scaledown_window=300,
-    secrets=[modal.Secret.from_name("huggingface-secret")],
+    secrets=[
+        modal.Secret.from_name("huggingface-secret"),
+        modal.Secret.from_name("postgres-secret"),
+        modal.Secret.from_name("falkordb-secret"),
+    ],
     mounts=[personality_mount, memory_mount],
 )
 class ClaraModel:
