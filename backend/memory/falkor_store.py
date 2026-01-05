@@ -210,12 +210,9 @@ class FalkorMemoryStore:
         self.port = port
         self.graph_name = graph_name
 
-        # Connect to FalkorDB
-        password = password or os.environ.get("FALKOR_PASSWORD") or None
-
-        # Only pass password if it's actually set (not empty string)
+        # Connect to FalkorDB - only use password if explicitly provided and non-empty
         connect_args = {"host": host, "port": port}
-        if password and password.strip():
+        if password and str(password).strip():
             connect_args["password"] = password
 
         self.db = FalkorDB(**connect_args)

@@ -177,11 +177,13 @@ def test_full_mode():
             hdc_dimensions=1000,
             postgres_host="localhost",
             postgres_port=5432,
-            postgres_db="clara",
+            postgres_db=os.environ.get("POSTGRES_DB", "claralily"),
             postgres_user="postgres",
+            postgres_password=os.environ.get("POSTGRES_PASSWORD", ""),
             falkor_host="localhost",
             falkor_port=6379,
             falkor_graph="clara_test",
+            falkor_password=None,  # Explicitly no password
         )
 
         if not memory.enable_postgres or not memory.enable_falkor:
