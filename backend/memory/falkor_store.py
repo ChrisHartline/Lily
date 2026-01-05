@@ -15,8 +15,7 @@ from datetime import datetime
 from dataclasses import dataclass
 
 try:
-    from redis import Redis
-    from redis.commands.graph import Graph
+    from falkordb import FalkorDB
     FALKOR_AVAILABLE = True
 except ImportError:
     FALKOR_AVAILABLE = False
@@ -205,7 +204,7 @@ class FalkorMemoryStore:
             password: Optional password
         """
         if not FALKOR_AVAILABLE:
-            raise ImportError("redis not installed. Run: pip install redis")
+            raise ImportError("falkordb not installed. Run: pip install falkordb")
 
         self.host = host
         self.port = port
@@ -213,14 +212,13 @@ class FalkorMemoryStore:
 
         # Connect to FalkorDB
         password = password or os.environ.get("FALKOR_PASSWORD")
-        self.redis = Redis(
+        self.db = FalkorDB(
             host=host,
             port=port,
-            password=password,
-            decode_responses=True
+            password=password if password else None,
         )
 
-        self.graph = Graph(self.redis, graph_name)
+        self.graph = self.db.select_graph(graph_name)
 
         # Entity extractor
         self.extractor = EntityExtractor(use_llm=False)  # Start with patterns
@@ -593,6 +591,6 @@ class FalkorMemoryStore:
 
     def close(self):
         """Close connection."""
-        if self.redis:
-            self.redis.close()
+        if self.db:
+            self.db.close()
             print("[FalkorDB] Connection closed")
