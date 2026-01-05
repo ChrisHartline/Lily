@@ -590,6 +590,6 @@ class FalkorMemoryStore:
 
     def close(self):
         """Close connection."""
-        if self.db:
-            self.db.close()
-            print("[FalkorDB] Connection closed")
+        # FalkorDB sync client doesn't have explicit close - uses redis-py connection management
+        # Just log that we're done
+        print("[FalkorDB] Connection closed")

@@ -224,7 +224,7 @@ class PostgresMemoryStore:
         sql = """
         SELECT id, content, tier, importance, timestamp, metadata, hdc_vector
         FROM memories
-        WHERE id = ANY(%s)
+        WHERE id = ANY(%s::uuid[])
         """
 
         try:
