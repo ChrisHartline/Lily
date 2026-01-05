@@ -211,12 +211,14 @@ class FalkorMemoryStore:
         self.graph_name = graph_name
 
         # Connect to FalkorDB
-        password = password or os.environ.get("FALKOR_PASSWORD")
-        self.db = FalkorDB(
-            host=host,
-            port=port,
-            password=password if password else None,
-        )
+        password = password or os.environ.get("FALKOR_PASSWORD") or None
+
+        # Only pass password if it's actually set (not empty string)
+        connect_args = {"host": host, "port": port}
+        if password and password.strip():
+            connect_args["password"] = password
+
+        self.db = FalkorDB(**connect_args)
 
         self.graph = self.db.select_graph(graph_name)
 
