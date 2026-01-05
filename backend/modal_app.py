@@ -47,7 +47,7 @@ MODEL_CACHE_DIR = "/root/.cache/huggingface"
 MEMORY_CONFIG = {
     "postgres_host": os.environ.get("POSTGRES_HOST", "localhost"),
     "postgres_port": int(os.environ.get("POSTGRES_PORT", "5432")),
-    "postgres_db": os.environ.get("POSTGRES_DB", "clara"),
+    "postgres_db": os.environ.get("POSTGRES_DB", "claraLily"),
     "postgres_user": os.environ.get("POSTGRES_USER", "postgres"),
     "postgres_password": os.environ.get("POSTGRES_PASSWORD", ""),
     "falkor_host": os.environ.get("FALKOR_HOST", "localhost"),
