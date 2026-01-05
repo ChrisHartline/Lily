@@ -17,9 +17,20 @@ Prerequisites:
     - FalkorDB running on localhost:6379 (optional)
 """
 
+import os
 import sys
 from pathlib import Path
 from datetime import datetime
+
+# Load .env file if it exists
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent.parent.parent / ".env"
+    if env_path.exists():
+        load_dotenv(env_path)
+        print(f"[Config] Loaded .env from {env_path}")
+except ImportError:
+    print("[Config] python-dotenv not installed, using defaults")
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
