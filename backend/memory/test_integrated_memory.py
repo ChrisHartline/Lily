@@ -110,8 +110,9 @@ def test_with_postgres():
             hdc_dimensions=1000,
             postgres_host="localhost",
             postgres_port=5432,
-            postgres_db="clara",
+            postgres_db=os.environ.get("POSTGRES_DB", "clara"),
             postgres_user="postgres",
+            postgres_password=os.environ.get("POSTGRES_PASSWORD", ""),
             enable_falkor=False,
         )
 
@@ -177,7 +178,7 @@ def test_full_mode():
             hdc_dimensions=1000,
             postgres_host="localhost",
             postgres_port=5432,
-            postgres_db=os.environ.get("POSTGRES_DB", "claralily"),
+            postgres_db=os.environ.get("POSTGRES_DB", "clara"),
             postgres_user="postgres",
             postgres_password=os.environ.get("POSTGRES_PASSWORD", ""),
             falkor_host="localhost",
