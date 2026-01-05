@@ -53,7 +53,7 @@ class IntegratedMemory:
         # PostgreSQL settings
         postgres_host: str = "localhost",
         postgres_port: int = 5432,
-        postgres_db: str = "claraLily",
+        postgres_db: str = "claralily",
         postgres_user: str = "postgres",
         postgres_password: str = None,
         # FalkorDB settings
