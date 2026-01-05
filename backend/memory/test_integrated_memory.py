@@ -182,7 +182,7 @@ def test_full_mode():
             postgres_password=os.environ.get("POSTGRES_PASSWORD", ""),
             falkor_host="localhost",
             falkor_port=6379,
-            falkor_graph="clara_test",
+            falkor_graph=os.environ.get("FALKOR_GRAPH", "claralilymem"),
             falkor_password=None,  # Explicitly no password
         )
 

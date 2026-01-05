@@ -191,7 +191,7 @@ class FalkorMemoryStore:
         self,
         host: str = "localhost",
         port: int = 6379,
-        graph_name: str = "clara_memory",
+        graph_name: str = "claralilymem",
         password: str = None,
     ):
         """
