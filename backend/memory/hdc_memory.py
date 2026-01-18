@@ -24,6 +24,14 @@ import json
 
 from .base import MemoryStore, Memory, MemoryTier, ConsolidationEngine
 
+# Try to import sentence-transformers for real embeddings
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
+    print("[HDCMemory] sentence-transformers not available, using fallback encoding")
+
 
 class HDCMemory(MemoryStore):
     """
@@ -37,15 +45,25 @@ class HDCMemory(MemoryStore):
     - Session: 1.0 (highest priority, current context)
     - Daily: 0.7 (today's consolidated)
     - Long-term: 0.5 (permanent facts)
+
+    Embedding options:
+    - Real: Uses sentence-transformers (all-MiniLM-L6-v2, 384-dim) for semantic similarity
+    - Fallback: Hash-based deterministic encoding when transformers unavailable
     """
+
+    # Default embedding model - matches the router in modal_app.py
+    DEFAULT_EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+    DEFAULT_EMBEDDING_DIM = 384  # MiniLM outputs 384-dim vectors
 
     def __init__(
         self,
-        dim: int = 10000,
+        dim: int = 64000,  # Upgraded to 64k for production
         tier_weights: Optional[Dict[str, float]] = None,
         importance_threshold: float = 0.7,
         decay_days: int = 7,
-        seed: int = 42
+        seed: int = 42,
+        embedding_model: Optional[str] = None,
+        use_real_embeddings: bool = True,
     ):
         """
         Initialize HDC memory.
@@ -56,6 +74,8 @@ class HDCMemory(MemoryStore):
             importance_threshold: Min importance to promote to longterm
             decay_days: Days before low-importance memories decay
             seed: Random seed for reproducibility
+            embedding_model: Sentence-transformers model name (default: all-MiniLM-L6-v2)
+            use_real_embeddings: Whether to use sentence-transformers (True) or fallback (False)
         """
         self.dim = dim
         self.tier_weights = tier_weights or {
@@ -65,10 +85,16 @@ class HDCMemory(MemoryStore):
         }
         self.importance_threshold = importance_threshold
         self.decay_days = decay_days
+        self.seed = seed
 
-        # Random projection matrix for text encoding
-        np.random.seed(seed)
-        self.projection = np.random.randn(dim, 768)  # Assuming 768-dim input embeddings
+        # Embedding configuration
+        self.embedding_model_name = embedding_model or self.DEFAULT_EMBEDDING_MODEL
+        self.use_real_embeddings = use_real_embeddings and SENTENCE_TRANSFORMERS_AVAILABLE
+        self._embedder = None  # Lazy-loaded
+        self._embedding_dim = None  # Set when embedder loads
+
+        # Random projection matrix - created lazily after we know embedding dim
+        self._projection = None
 
         # Memory storage: id -> (Memory, hypervector)
         self.memories: Dict[str, Tuple[Memory, np.ndarray]] = {}
@@ -76,12 +102,43 @@ class HDCMemory(MemoryStore):
         # Bindings: associative connections between memories
         self.bindings: Dict[str, List[str]] = {}
 
+        print(f"[HDCMemory] Initialized with {dim} dimensions, "
+              f"real_embeddings={'enabled' if self.use_real_embeddings else 'disabled (fallback)'}")
+
+    def _get_embedder(self):
+        """Lazy-load the sentence transformer embedder."""
+        if self._embedder is None and self.use_real_embeddings:
+            try:
+                print(f"[HDCMemory] Loading embedding model: {self.embedding_model_name}")
+                self._embedder = SentenceTransformer(self.embedding_model_name)
+                self._embedding_dim = self._embedder.get_sentence_embedding_dimension()
+                print(f"[HDCMemory] Embedder loaded ({self._embedding_dim}-dim)")
+            except Exception as e:
+                print(f"[HDCMemory] Failed to load embedder: {e}, using fallback")
+                self.use_real_embeddings = False
+                self._embedding_dim = 384  # Fallback dimension
+        return self._embedder
+
+    def _get_projection_matrix(self) -> np.ndarray:
+        """Get or create the random projection matrix."""
+        if self._projection is None:
+            # Ensure embedder is loaded to get correct dimension
+            if self.use_real_embeddings:
+                self._get_embedder()
+
+            embedding_dim = self._embedding_dim or self.DEFAULT_EMBEDDING_DIM
+            np.random.seed(self.seed)
+            self._projection = np.random.randn(self.dim, embedding_dim)
+            print(f"[HDCMemory] Created projection matrix: {embedding_dim} → {self.dim}")
+
+        return self._projection
+
     def _text_to_hv(self, text: str) -> np.ndarray:
         """
         Encode text to hyperdimensional vector.
 
-        Simple approach: Hash-based encoding with random projections.
-        For production: Use sentence-transformers embedding first.
+        Uses sentence-transformers for real semantic embeddings when available,
+        with fallback to hash-based encoding for testing/edge deployment.
 
         Args:
             text: Input text
@@ -89,21 +146,50 @@ class HDCMemory(MemoryStore):
         Returns:
             Bipolar hypervector (-1, +1) of shape (dim,)
         """
-        # Create deterministic seed from text
-        text_hash = int(hashlib.sha256(text.encode()).hexdigest(), 16)
-        np.random.seed(text_hash % (2**32))
-
-        # Generate base embedding (simulated - replace with real embedder)
-        base_embedding = np.random.randn(768)
+        # Get base embedding
+        if self.use_real_embeddings:
+            embedder = self._get_embedder()
+            if embedder is not None:
+                # Real semantic embedding
+                base_embedding = embedder.encode(text, convert_to_numpy=True)
+            else:
+                # Fallback if embedder failed to load
+                base_embedding = self._fallback_embedding(text)
+        else:
+            # Fallback mode
+            base_embedding = self._fallback_embedding(text)
 
         # Project to high-dimensional space
-        hv = self.projection @ base_embedding
+        projection = self._get_projection_matrix()
+        hv = projection @ base_embedding
 
         # Bipolarize: sign function
         hv = np.sign(hv)
         hv[hv == 0] = 1  # Handle zeros
 
-        return hv
+        return hv.astype(np.float32)
+
+    def _fallback_embedding(self, text: str) -> np.ndarray:
+        """
+        Fallback hash-based embedding when sentence-transformers unavailable.
+
+        Creates deterministic pseudo-embeddings from text hash.
+        Not semantically meaningful but consistent.
+
+        Args:
+            text: Input text
+
+        Returns:
+            Pseudo-embedding vector of shape (embedding_dim,)
+        """
+        embedding_dim = self._embedding_dim or self.DEFAULT_EMBEDDING_DIM
+
+        # Create deterministic seed from text
+        text_hash = int(hashlib.sha256(text.encode()).hexdigest(), 16)
+        np.random.seed(text_hash % (2**32))
+
+        # Generate pseudo-embedding
+        return np.random.randn(embedding_dim).astype(np.float32)
 
     def _similarity(self, hv1: np.ndarray, hv2: np.ndarray) -> float:
         """
@@ -294,6 +380,8 @@ class HDCMemory(MemoryStore):
         data = {
             "dim": self.dim,
             "tier_weights": self.tier_weights,
+            "embedding_model": self.embedding_model_name,
+            "embedding_dim": self._embedding_dim or self.DEFAULT_EMBEDDING_DIM,
             "memories": {
                 mid: {
                     "memory": mem.to_dict(),
@@ -305,6 +393,7 @@ class HDCMemory(MemoryStore):
         }
         with open(path, 'w') as f:
             json.dump(data, f)
+        print(f"[HDCMemory] Saved {len(self.memories)} memories to {path}")
 
     def load(self, path: str):
         """Load memory state from file."""
@@ -315,12 +404,22 @@ class HDCMemory(MemoryStore):
         self.tier_weights = data["tier_weights"]
         self.bindings = data["bindings"]
 
+        # Load embedding config if present (backward compatible)
+        if "embedding_model" in data:
+            self.embedding_model_name = data["embedding_model"]
+        if "embedding_dim" in data:
+            self._embedding_dim = data["embedding_dim"]
+            # Regenerate projection matrix for loaded dimension
+            self._projection = None
+
         self.memories = {}
         for mid, item in data["memories"].items():
             mem = Memory.from_dict(item["memory"])
-            hv = np.array(item["hv"])
+            hv = np.array(item["hv"], dtype=np.float32)
             mem.embedding = hv
             self.memories[mid] = (mem, hv)
+
+        print(f"[HDCMemory] Loaded {len(self.memories)} memories from {path}")
 
 
 class ClassicalConsolidation(ConsolidationEngine):

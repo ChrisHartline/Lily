@@ -54,7 +54,7 @@ MEMORY_CONFIG = {
     "falkor_port": int(os.environ.get("FALKOR_PORT", "6379")),
     "falkor_graph": os.environ.get("FALKOR_GRAPH", "claralilymem"),
     "falkor_password": os.environ.get("FALKOR_PASSWORD", ""),
-    "hdc_dimensions": int(os.environ.get("HDC_DIMENSIONS", "10000")),
+    "hdc_dimensions": int(os.environ.get("HDC_DIMENSIONS", "64000")),
     "enable_memory": os.environ.get("ENABLE_MEMORY", "true").lower() == "true",
 }
 

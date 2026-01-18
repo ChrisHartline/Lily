@@ -49,7 +49,7 @@ class IntegratedMemory:
     def __init__(
         self,
         # HDC settings
-        hdc_dimensions: int = 10000,
+        hdc_dimensions: int = 64000,  # 64k for production, 10k for edge
         # PostgreSQL settings
         postgres_host: str = "localhost",
         postgres_port: int = 5432,
