@@ -323,7 +323,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ setView, avatarUrl, setAvat
             <div
               className="h-32 rounded-lg bg-cover bg-center mb-4 relative overflow-hidden"
               style={{
-                backgroundImage: wallpaperUrl ? `url("${wallpaperUrl}")` : `url("https://i.imgur.com/8sC2TSy.png")`,
+                backgroundImage: wallpaperUrl ? `url("${wallpaperUrl}")` : `url("${DEFAULT_WALLPAPER}")`,
                 backgroundColor: '#0A0E1A'
               }}
             >
@@ -411,9 +411,9 @@ const BottomNavBar: React.FC<{ currentView: View; setView: (v: View) => void }> 
 
 // --- Main App Component ---
 
-// Default images
-const DEFAULT_AVATAR = "https://i.imgur.com/s22ZlE8.png";
-const DEFAULT_WALLPAPER = "";
+// Default images (use local public images in /public/images)
+const DEFAULT_AVATAR = "/images/lily.svg";
+const DEFAULT_WALLPAPER = "/images/background.svg";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('chat');
