@@ -19,7 +19,7 @@ Prerequisites:
 """
 
 import modal
-from modal import Image, App, asgi_app, Mount
+from modal import Image, App, asgi_app
 import os
 import json
 from pathlib import Path
@@ -130,18 +130,16 @@ image = (
     )
 )
 
-# Create Modal app with mounts for personality modules and memory code
+# Create Modal app
 app = App(APP_NAME)
 
-# Mount personality modules into the container
-personality_mount = Mount.from_local_dir(
-    local_path=Path(__file__).parent.parent / "clara_prompts",
+# Add local directories to image (personality modules and memory code)
+# These will be copied into the image at build time
+image = image.add_local_dir(
+    Path(__file__).parent.parent / "clara_prompts",
     remote_path="/root/clara_prompts",
-)
-
-# Mount memory system code
-memory_mount = Mount.from_local_dir(
-    local_path=Path(__file__).parent / "memory",
+).add_local_dir(
+    Path(__file__).parent / "memory",
     remote_path="/root/memory",
 )
 
@@ -157,7 +155,6 @@ memory_mount = Mount.from_local_dir(
         modal.Secret.from_name("postgres-secret"),
         modal.Secret.from_name("falkordb-secret"),
     ],
-    mounts=[personality_mount, memory_mount],
 )
 class ClaraModel:
     """Clara model wrapper for Modal with personality and memory support"""
