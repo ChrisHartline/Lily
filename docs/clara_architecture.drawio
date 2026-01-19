@@ -1,0 +1,249 @@
+<mxfile host="app.diagrams.net" modified="2026-01-19T21:00:00.000Z" agent="Clara Architecture" version="24.0.0">
+  <diagram name="Clara System Architecture" id="clara-arch">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="🌸 Clara/Lily - System Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#1a1a2e;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- User Layer -->
+        <mxCell id="user-layer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#dee2e6;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="1320" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="user-label" value="👤 USER LAYER" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#6c757d;" vertex="1" parent="1">
+          <mxGeometry x="50" y="85" width="150" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="user" value="User&#xa;(Chris)" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#4361ee;strokeColor=#3a0ca3;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="100" y="110" width="60" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="frontend" value="React Frontend&#xa;Vite + Tailwind" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7209b7;strokeColor=#560bad;fontColor=#ffffff;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="220" y="115" width="120" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="websocket" value="WebSocket&#xa;Real-time Chat" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f72585;strokeColor=#b5179e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="380" y="115" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="rest" value="REST API&#xa;/api/chat" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f72585;strokeColor=#b5179e;fontColor=#ffffff;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="500" y="115" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Modal Cloud Layer -->
+        <mxCell id="modal-layer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f4f8;strokeColor=#4cc9f0;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="1320" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="modal-label" value="☁️ MODAL CLOUD (GPU: T4)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#0077b6;" vertex="1" parent="1">
+          <mxGeometry x="50" y="205" width="200" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- FastAPI -->
+        <mxCell id="fastapi" value="FastAPI&#xa;Application" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4cc9f0;strokeColor=#0096c7;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Memory Recall Box -->
+        <mxCell id="memory-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="230" width="400" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="memory-label" value="🧠 MEMORY RECALL" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#856404;" vertex="1" parent="1">
+          <mxGeometry x="270" y="235" width="130" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="hdc" value="HDC Memory&#xa;64k dimensions&#xa;Sentence Transformers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ff9f1c;strokeColor=#f77f00;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="260" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="falkor-recall" value="FalkorDB&#xa;Graph RAG&#xa;Entity Expansion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ff9f1c;strokeColor=#f77f00;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="405" y="260" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="integrated" value="Integrated&#xa;Memory&#xa;Manager" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fcbf49;strokeColor=#f77f00;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="530" y="260" width="110" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Personality Box -->
+        <mxCell id="personality-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="230" width="300" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="personality-label" value="🎭 PERSONALITY SYSTEM" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#155724;" vertex="1" parent="1">
+          <mxGeometry x="690" y="235" width="160" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="core-mod" value="Core Module&#xa;(Always Loaded)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#48cae4;strokeColor=#00b4d8;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="700" y="260" width="90" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ctx-mod" value="Contextual&#xa;Modules&#xa;(Triggered)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#48cae4;strokeColor=#00b4d8;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="800" y="260" width="80" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="ctx-builder" value="Context&#xa;Builder" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90e0ef;strokeColor=#00b4d8;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="890" y="260" width="70" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- LLM Box -->
+        <mxCell id="llm-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8d7da;strokeColor=#dc3545;strokeWidth=2;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="230" width="340" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="llm-label" value="🤖 LLM INFERENCE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#721c24;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="235" width="120" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="phi3" value="Phi-3 Mini&#xa;4-bit Quantized" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e63946;strokeColor=#d62828;fontColor=#ffffff;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="260" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="lora" value="LoRA Adapters&#xa;warmth&#xa;playful&#xa;encouragement" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ff6b6b;strokeColor=#d62828;fontColor=#ffffff;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1135" y="255" width="90" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="router" value="Semantic&#xa;Router" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f4a261;strokeColor=#e76f51;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="260" width="80" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Memory Store Row -->
+        <mxCell id="store-label" value="💾 MEMORY STORAGE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#0077b6;" vertex="1" parent="1">
+          <mxGeometry x="260" y="345" width="140" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="store-hdc" value="Store HDC Vector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ade8f4;strokeColor=#0096c7;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="365" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="store-graph" value="Update Graph" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ade8f4;strokeColor=#0096c7;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="395" y="365" width="100" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="store-pg" value="Store to PostgreSQL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ade8f4;strokeColor=#0096c7;fontColor=#000000;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="510" y="365" width="110" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- External Services Layer -->
+        <mxCell id="external-layer" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e3e5;strokeColor=#6c757d;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="40" y="480" width="1320" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="external-label" value="🌐 EXTERNAL SERVICES" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#495057;" vertex="1" parent="1">
+          <mxGeometry x="50" y="485" width="180" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="supabase" value="Supabase&#xa;PostgreSQL&#xa;&#xa;• memories table&#xa;• HDC vectors (bytes)&#xa;• metadata, timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#3ecf8e;strokeColor=#1c7c54;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="100" y="510" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="falkordb" value="FalkorDB Cloud&#xa;Graph Database&#xa;&#xa;• Entity nodes&#xa;• Relationship edges&#xa;• Memory links" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ff6b6b;strokeColor=#c9184a;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="320" y="510" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="huggingface" value="HuggingFace Hub&#xa;&#xa;• Phi-3 base model&#xa;• LoRA adapters&#xa;• Sentence transformers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc00;strokeColor=#f5a623;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="540" y="510" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="modal-secrets" value="Modal Secrets&#xa;&#xa;• huggingface-secret&#xa;• postgres-secret&#xa;• falkordb-secret" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6366f1;strokeColor=#4338ca;fontColor=#ffffff;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="510" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Personality Modules -->
+        <mxCell id="modules" value="Personality Modules&#xa;(clara_prompts/)&#xa;&#xa;• clara_core_prompt.json&#xa;• clara_medical_module.json&#xa;• clara_tech_module.json&#xa;• clara_faith_module.json" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#48cae4;strokeColor=#0096c7;fontColor=#000000;fontSize=10;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="510" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Flow Legend -->
+        <mxCell id="legend" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#adb5bd;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="510" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="LEGEND" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#495057;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="515" width="160" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-1" value="🧠 Memory System" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#856404;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="532" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-2" value="🎭 Personality" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#155724;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="547" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-3" value="🤖 LLM Inference" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#721c24;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="562" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-4" value="☁️ Cloud Services" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#0077b6;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="577" width="100" height="15" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows / Connections -->
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4361ee;strokeWidth=2;" edge="1" parent="1" source="user" target="frontend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7209b7;strokeWidth=2;" edge="1" parent="1" source="frontend" target="websocket">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#f72585;strokeWidth=2;" edge="1" parent="1" source="websocket" target="fastapi">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="430" y="190" />
+              <mxPoint x="160" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#4cc9f0;strokeWidth=2;" edge="1" parent="1" source="fastapi" target="hdc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff9f1c;strokeWidth=2;" edge="1" parent="1" source="integrated" target="ctx-builder">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#48cae4;strokeWidth=2;" edge="1" parent="1" source="ctx-builder" target="phi3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#3ecf8e;strokeWidth=2;" edge="1" parent="1" source="store-pg" target="supabase">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="565" y="440" />
+              <mxPoint x="190" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#ff6b6b;strokeWidth=2;" edge="1" parent="1" source="store-graph" target="falkordb">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="445" y="440" />
+              <mxPoint x="410" y="440" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Memory Tier Labels -->
+        <mxCell id="tier-session" value="SESSION&#xa;(In-Memory)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#ffc107;fontColor=#856404;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="40" y="630" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tier-daily" value="DAILY&#xa;(Buffer)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#0d6efd;fontColor=#084298;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="150" y="630" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tier-longterm" value="LONG-TERM&#xa;(Persistent)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#198754;fontColor=#0f5132;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="260" y="630" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tier-arrow1" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#6c757d;" vertex="1" parent="1">
+          <mxGeometry x="140" y="640" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tier-arrow2" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#6c757d;" vertex="1" parent="1">
+          <mxGeometry x="250" y="640" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tier-label" value="MEMORY TIERS:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#495057;" vertex="1" parent="1">
+          <mxGeometry x="40" y="610" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <!-- Tech Stack -->
+        <mxCell id="tech-stack" value="TECH STACK: React + Vite | FastAPI | Modal (T4 GPU) | Phi-3 + LoRA | HDC 64k | PostgreSQL | FalkorDB" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontColor=#6c757d;" vertex="1" parent="1">
+          <mxGeometry x="400" y="630" width="600" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="version" value="Clara v1.0 | January 2026" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=10;fontColor=#adb5bd;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="630" width="150" height="20" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
