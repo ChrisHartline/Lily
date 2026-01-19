@@ -192,7 +192,9 @@ class FalkorMemoryStore:
         host: str = "localhost",
         port: int = 6379,
         graph_name: str = "claralilymem",
+        username: str = None,
         password: str = None,
+        ssl: bool = False,
     ):
         """
         Initialize FalkorDB connection.
@@ -201,7 +203,9 @@ class FalkorMemoryStore:
             host: FalkorDB host
             port: FalkorDB port (default 6379)
             graph_name: Name of the graph
+            username: Optional username (required for FalkorDB Cloud, typically 'falkordb')
             password: Optional password
+            ssl: Whether to use SSL/TLS connection
         """
         if not FALKOR_AVAILABLE:
             raise ImportError("falkordb not installed. Run: pip install falkordb")
@@ -210,11 +214,16 @@ class FalkorMemoryStore:
         self.port = port
         self.graph_name = graph_name
 
-        # Connect to FalkorDB - only use password if explicitly provided and non-empty
+        # Connect to FalkorDB
         connect_args = {"host": host, "port": port}
+        if username and str(username).strip():
+            connect_args["username"] = username
         if password and str(password).strip():
             connect_args["password"] = password
+        if ssl:
+            connect_args["ssl"] = True
 
+        print(f"[FalkorDB] Connecting to {host}:{port} (user={username or 'none'}, SSL={'enabled' if ssl else 'disabled'})...")
         self.db = FalkorDB(**connect_args)
 
         self.graph = self.db.select_graph(graph_name)
@@ -227,14 +236,25 @@ class FalkorMemoryStore:
 
     def _ensure_schema(self):
         """Create indexes for common queries."""
-        try:
-            # Create indexes on entity names and types
-            self.graph.query("CREATE INDEX IF NOT EXISTS FOR (e:Entity) ON (e.name)")
-            self.graph.query("CREATE INDEX IF NOT EXISTS FOR (e:Entity) ON (e.type)")
-            self.graph.query("CREATE INDEX IF NOT EXISTS FOR (m:Memory) ON (m.id)")
-            print("[FalkorDB] Schema indexes verified")
-        except Exception as e:
-            print(f"[FalkorDB] Schema setup note: {e}")
+        # Note: FalkorDB Cloud may not support IF NOT EXISTS syntax
+        # Indexes are created silently or errors are ignored if they exist
+        indexes = [
+            ("Entity", "name"),
+            ("Entity", "type"),
+            ("Memory", "id"),
+        ]
+        
+        created = 0
+        for label, prop in indexes:
+            try:
+                self.graph.query(f"CREATE INDEX FOR (n:{label}) ON (n.{prop})")
+                created += 1
+            except Exception as e:
+                # Index likely already exists, which is fine
+                if "already indexed" not in str(e).lower() and "exists" not in str(e).lower():
+                    pass  # Silently continue
+        
+        print(f"[FalkorDB] Schema indexes verified")
 
     def set_llm_extractor(self, llm_func: callable):
         """
