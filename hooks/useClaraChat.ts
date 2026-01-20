@@ -32,7 +32,7 @@ export function useClaraChat(initialMessages: Message[]) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: userMessage,
+          message: userMessage,
           personality: personality,
         }),
       });

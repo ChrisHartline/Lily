@@ -412,8 +412,8 @@ const BottomNavBar: React.FC<{ currentView: View; setView: (v: View) => void }> 
 // --- Main App Component ---
 
 // Default images (use local public images in /public/images)
-const DEFAULT_AVATAR = "/images/lily.svg";
-const DEFAULT_WALLPAPER = "/images/background.svg";
+const DEFAULT_AVATAR = "/images/lily.png";
+const DEFAULT_WALLPAPER = "/images/background.png";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('chat');
