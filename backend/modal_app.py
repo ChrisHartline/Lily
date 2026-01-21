@@ -363,11 +363,11 @@ class ClaraModel:
                 max_length=2048
             ).to(self.knowledge_model.device)
 
-            # Generate
+            # Generate (reduced tokens for faster response)
             with torch.no_grad():
                 outputs = self.knowledge_model.generate(
                     **inputs,
-                    max_new_tokens=512,
+                    max_new_tokens=128,  # Reduced from 512 for faster responses
                     temperature=0.7,
                     top_p=0.9,
                     do_sample=True,
