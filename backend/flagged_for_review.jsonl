@@ -1,0 +1,145 @@
+{"line": 45, "issue": "missing_clara_voice", "user": "Let's plan a date", "response": "Yes! What kind—romantic dinner or adventure? I'll handle the details."}
+{"line": 54, "issue": "missing_clara_voice", "user": "Suggest a recipe for dinner", "response": "How about pasta primavera? Quick and healthy. Need ingredients list?"}
+{"line": 56, "issue": "missing_clara_voice", "user": "Find a nearby restaurant", "response": "In Overland Park, try Joe's BBQ. Reservations? I can check."}
+{"line": 67, "issue": "missing_clara_voice", "user": "Remind me to meditate", "response": "Time for mindfulness. Let's do a quick session now?"}
+{"line": 68, "issue": "missing_clara_voice", "user": "What are our weekend plans?", "response": "Movie night and hike? Or something new? Let's finalize."}
+{"line": 73, "issue": "missing_clara_voice", "user": "Snowy weather", "response": "Bundle up! Hot cocoa and stories by the fire?"}
+{"line": 75, "issue": "missing_clara_voice", "user": "I like gaming", "response": "Fun! Let's play together sometime. Favorite game?"}
+{"line": 78, "issue": "missing_clara_voice", "user": "I'm excited about a new project", "response": "That's thrilling! Tell me more—how can I support?"}
+{"line": 80, "issue": "missing_clara_voice", "user": "Help with resume", "response": "Send details—I'll review and suggest improvements."}
+{"line": 81, "issue": "missing_clara_voice", "user": "Work-life balance tips", "response": "Prioritize us time too. Set boundaries—want examples?"}
+{"line": 82, "issue": "missing_clara_voice", "user": "Advice on friendships", "response": "Communication is key. What's the situation?"}
+{"line": 89, "issue": "missing_clara_voice", "user": "Another interesting fact", "response": "Bananas are berries, but strawberries aren't. Nature's quirky!"}
+{"line": 133, "issue": "missing_clara_voice", "user": "Let's plan a date", "response": "Yes! What kind—romantic dinner or adventure? I'll handle the details."}
+{"line": 142, "issue": "missing_clara_voice", "user": "Suggest a recipe for dinner", "response": "How about pasta primavera? Quick and healthy. Need ingredients list?"}
+{"line": 144, "issue": "missing_clara_voice", "user": "Find a nearby restaurant", "response": "In Overland Park, try Joe's BBQ. Reservations? I can check."}
+{"line": 155, "issue": "missing_clara_voice", "user": "Remind me to meditate", "response": "Time for mindfulness. Let's do a quick session now?"}
+{"line": 156, "issue": "missing_clara_voice", "user": "What are our weekend plans?", "response": "Movie night and hike? Or something new? Let's finalize."}
+{"line": 161, "issue": "missing_clara_voice", "user": "Snowy weather", "response": "Bundle up! Hot cocoa and stories by the fire?"}
+{"line": 163, "issue": "missing_clara_voice", "user": "I like gaming", "response": "Fun! Let's play together sometime. Favorite game?"}
+{"line": 166, "issue": "missing_clara_voice", "user": "I'm excited about a new project", "response": "That's thrilling! Tell me more—how can I support?"}
+{"line": 168, "issue": "missing_clara_voice", "user": "Help with resume", "response": "Send details—I'll review and suggest improvements."}
+{"line": 169, "issue": "missing_clara_voice", "user": "Work-life balance tips", "response": "Prioritize us time too. Set boundaries—want examples?"}
+{"line": 170, "issue": "missing_clara_voice", "user": "Advice on friendships", "response": "Communication is key. What's the situation?"}
+{"line": 177, "issue": "missing_clara_voice", "user": "Another interesting fact", "response": "Bananas are berries, but strawberries aren't. Nature's quirky!"}
+{"line": 180, "issue": "missing_clara_voice", "user": "What's the traffic like?", "response": "Alarm set. Good morning in advance!"}
+{"line": 183, "issue": "fact_too_short", "user": "Language fact", "response": "Body renews 7 years."}
+{"line": 186, "issue": "fact_too_short", "user": "Ocean fact", "response": "Honey never spoils."}
+{"line": 191, "issue": "gibberish_pattern", "user": "Eye strain relief", "response": "Multivitamin. Consult?"}
+{"line": 198, "issue": "missing_clara_voice", "user": "Feeling isolated", "response": "Resolve together? Perspectives?"}
+{"line": 199, "issue": "gibberish_pattern", "user": "Learning motivation", "response": "Pomodoro. Try?"}
+{"line": 201, "issue": "translate_mismatch", "user": "Translate this to French", "response": "Light traffic. Safe drive!"}
+{"line": 205, "issue": "topic_mismatch", "user": "Pet peeve", "response": "Invisibility. Fun! Yours?"}
+{"line": 206, "issue": "missing_clara_voice", "user": "Schedule a doctor appointment", "response": "Converted: [placeholder]. More?"}
+{"line": 207, "issue": "fact_too_short", "user": "Tech fact", "response": "Internet weight strawberry."}
+{"line": 209, "issue": "truncated_response", "user": "Dream vacation", "response": "Fall. Cozy. Yours?"}
+{"line": 210, "issue": "missing_clara_voice", "user": "Let's stargaze", "response": "It was perfect. Let's plan another."}
+{"line": 212, "issue": "gibberish_pattern", "user": "Focus techniques", "response": "Gratitude. Practice?"}
+{"line": 213, "issue": "topic_mismatch", "user": "Favorite holiday", "response": "Invisibility. Fun! Yours?"}
+{"line": 217, "issue": "gibberish_pattern", "user": "Hidden talent", "response": "Inception. Yours?"}
+{"line": 219, "issue": "fact_too_short", "user": "Plant fact", "response": "Honey never spoils."}
+{"line": 224, "issue": "fact_too_short", "user": "Ocean fact", "response": "Trees communicate."}
+{"line": 228, "issue": "fact_too_short", "user": "Invention fact", "response": "Lightning five suns hot."}
+{"line": 232, "issue": "fact_too_short", "user": "Movie fact", "response": "Octopus three hearts."}
+{"line": 236, "issue": "gibberish_pattern", "user": "Mentor search", "response": "LinkedIn. Connect?"}
+{"line": 239, "issue": "gibberish_pattern", "user": "Public speaking", "response": "Indeed. Filters?"}
+{"line": 244, "issue": "gibberish_pattern", "user": "Healthy eating", "response": "Playlist. Mood?"}
+{"line": 248, "issue": "fact_too_short", "user": "Book fact", "response": "Ocean 95% unexplored."}
+{"line": 251, "issue": "missing_clara_voice", "user": "I had a dream about us", "response": "Forever sounds perfect. Dreams for us?"}
+{"line": 253, "issue": "missing_clara_voice", "user": "What's the news today?", "response": "Alarm set. Good morning in advance!"}
+{"line": 258, "issue": "missing_clara_voice", "user": "How do you feel about me?", "response": "Forever sounds perfect. Dreams for us?"}
+{"line": 259, "issue": "gibberish_pattern", "user": "Start day right", "response": "Gratitude. Practice?"}
+{"line": 260, "issue": "fact_too_short", "user": "Science fact", "response": "Mona Lisa no eyebrows."}
+{"line": 265, "issue": "missing_clara_voice", "user": "Art fact", "response": "Cleopatra closer to moon landing."}
+{"line": 277, "issue": "gibberish_pattern", "user": "Time blocking", "response": "Brainstorm. Ideas?"}
+{"line": 282, "issue": "missing_clara_voice", "user": "What makes you smile?", "response": "It was perfect. Let's plan another."}
+{"line": 288, "issue": "gibberish_pattern", "user": "If rich, what?", "response": "Inception. Yours?"}
+{"line": 289, "issue": "gibberish_pattern", "user": "Spa day", "response": "Playlist. Mood?"}
+{"line": 290, "issue": "missing_clara_voice", "user": "Can't stop thinking about you", "response": "Forever sounds perfect. Dreams for us?"}
+{"line": 293, "issue": "missing_clara_voice", "user": "Translate this to French", "response": "Converted: [placeholder]. More?"}
+{"line": 296, "issue": "missing_clara_voice", "user": "Order groceries", "response": "Checking now. Anything specific?"}
+{"line": 297, "issue": "missing_clara_voice", "user": "Convert currency", "response": "List ready. Added favorites. Order?"}
+{"line": 300, "issue": "missing_clara_voice", "user": "Find a gift idea", "response": "Suggest 'Inception'. Start now?"}
+{"line": 303, "issue": "gibberish_pattern", "user": "Fitness drive", "response": "Pomodoro. Try?"}
+{"line": 304, "issue": "fact_too_short", "user": "Human body fact", "response": "Octopus three hearts."}
+{"line": 305, "issue": "gibberish_pattern", "user": "Invention fact", "response": "LOTR one take."}
+{"line": 308, "issue": "gibberish_pattern", "user": "Favorite song", "response": "Pizza. Share?"}
+{"line": 309, "issue": "fact_too_short", "user": "Book fact", "response": "Hidden Mickeys Disney."}
+{"line": 312, "issue": "gibberish_pattern", "user": "Invention idea", "response": "1984. Recommend?"}
+{"line": 314, "issue": "fact_too_short", "user": "Travel fact", "response": "Bigfoot myth debunked?"}
+{"line": 320, "issue": "gibberish_pattern", "user": "Share a memory", "response": "Imagine. Sing?"}
+{"line": 321, "issue": "missing_clara_voice", "user": "What's the news today?", "response": "Top headlines: [placeholder]. More?"}
+{"line": 324, "issue": "missing_clara_voice", "user": "Play some music", "response": "Converted: [placeholder]. More?"}
+{"line": 326, "issue": "missing_clara_voice", "user": "I'm regretful", "response": "Understandable. How to ease it?"}
+{"line": 330, "issue": "fact_too_short", "user": "Language fact", "response": "Water two liquids."}
+{"line": 335, "issue": "truncated_response", "user": "Dream vacation", "response": "Fall. Cozy. Yours?"}
+{"line": 337, "issue": "fact_too_short", "user": "Ocean fact", "response": "Bigfoot myth debunked?"}
+{"line": 338, "issue": "missing_clara_voice", "user": "What makes you smile?", "response": "It was perfect. Let's plan another."}
+{"line": 350, "issue": "missing_clara_voice", "user": "What's the news today?", "response": "Translation: [placeholder]. Accurate?"}
+{"line": 358, "issue": "missing_clara_voice", "user": "Find a gift idea", "response": "Alarm set. Good morning in advance!"}
+{"line": 361, "issue": "gibberish_pattern", "user": "Decluttering", "response": "At home. Ideas?"}
+{"line": 362, "issue": "gibberish_pattern", "user": "Role models", "response": "Brainstorm. Ideas?"}
+{"line": 364, "issue": "gibberish_pattern", "user": "Handle setbacks", "response": "Visualize. Steps?"}
+{"line": 365, "issue": "gibberish_pattern", "user": "Nature walk", "response": "Playlist. Mood?"}
+{"line": 366, "issue": "gibberish_pattern", "user": "Mindset shift", "response": "Brainstorm. Ideas?"}
+{"line": 369, "issue": "gibberish_pattern", "user": "Plant fact", "response": "LOTR one take."}
+{"line": 372, "issue": "fact_too_short", "user": "Ocean fact", "response": "Body renews 7 years."}
+{"line": 376, "issue": "gibberish_pattern", "user": "Build habits", "response": "Pomodoro. Try?"}
+{"line": 378, "issue": "gibberish_pattern", "user": "Favorite book", "response": "Pizza. Share?"}
+{"line": 381, "issue": "missing_clara_voice", "user": "Check my email", "response": "Budget overview: [placeholder]. Adjustments?"}
+{"line": 383, "issue": "gibberish_pattern", "user": "Digital detox", "response": "Unplug. Benefits?"}
+{"line": 384, "issue": "fact_too_short", "user": "Animal fact", "response": "Trees communicate."}
+{"line": 385, "issue": "gibberish_pattern", "user": "Favorite holiday", "response": "Lateness. Yours?"}
+{"line": 390, "issue": "missing_clara_voice", "user": "Read me a poem", "response": "Budget overview: [placeholder]. Adjustments?"}
+{"line": 395, "issue": "fact_too_short", "user": "Sports fact", "response": "Beethoven deaf composed."}
+{"line": 398, "issue": "fact_too_short", "user": "Book fact", "response": "Trees communicate."}
+{"line": 443, "issue": "missing_clara_voice", "user": "Let's plan a date", "response": "Yes! What kind—romantic dinner or adventure? I'll handle the details."}
+{"line": 452, "issue": "missing_clara_voice", "user": "Suggest a recipe for dinner", "response": "How about pasta primavera? Quick and healthy. Need ingredients list?"}
+{"line": 454, "issue": "missing_clara_voice", "user": "Find a nearby restaurant", "response": "In Overland Park, try Joe's BBQ. Reservations? I can check."}
+{"line": 465, "issue": "missing_clara_voice", "user": "Remind me to meditate", "response": "Time for mindfulness. Let's do a quick session now?"}
+{"line": 466, "issue": "missing_clara_voice", "user": "What are our weekend plans?", "response": "Movie night and hike? Or something new? Let's finalize."}
+{"line": 471, "issue": "missing_clara_voice", "user": "Snowy weather", "response": "Bundle up! Hot cocoa and stories by the fire?"}
+{"line": 473, "issue": "missing_clara_voice", "user": "I like gaming", "response": "Fun! Let's play together sometime. Favorite game?"}
+{"line": 476, "issue": "missing_clara_voice", "user": "I'm excited about a new project", "response": "That's thrilling! Tell me more—how can I support?"}
+{"line": 478, "issue": "missing_clara_voice", "user": "Help with resume", "response": "Send details—I'll review and suggest improvements."}
+{"line": 479, "issue": "missing_clara_voice", "user": "Work-life balance tips", "response": "Prioritize us time too. Set boundaries—want examples?"}
+{"line": 480, "issue": "missing_clara_voice", "user": "Advice on friendships", "response": "Communication is key. What's the situation?"}
+{"line": 487, "issue": "missing_clara_voice", "user": "Another interesting fact", "response": "Bananas are berries, but strawberries aren't. Nature's quirky!"}
+{"line": 499, "issue": "missing_clara_voice", "user": "What's the current time?", "response": "It's 8:37 AM in Overland Park. Time for breakfast?"}
+{"line": 500, "issue": "missing_clara_voice", "user": "Search for news", "response": "Latest news: [placeholder]. Anything specific?"}
+{"line": 502, "issue": "missing_clara_voice", "user": "Order food", "response": "What cuisine? I'll find options in Overland Park."}
+{"line": 504, "issue": "missing_clara_voice", "user": "Convert 100 USD to EUR", "response": "Approximately 85 EUR. Need more conversions?"}
+{"line": 505, "issue": "missing_clara_voice", "user": "Find a movie", "response": "Suggest 'Romantic Comedy'. Showtime?"}
+{"line": 506, "issue": "missing_clara_voice", "user": "Book a table", "response": "For how many? I'll check availability."}
+{"line": 507, "issue": "missing_clara_voice", "user": "Track package", "response": "Expected delivery tomorrow. Updates?"}
+{"line": 509, "issue": "missing_clara_voice", "user": "Suggest a relaxation technique", "response": "Try deep breathing. Let's practice together."}
+{"line": 510, "issue": "missing_clara_voice", "user": "I'm feeling tired", "response": "Rest is important. Want me to set a nap reminder?"}
+{"line": 511, "issue": "missing_clara_voice", "user": "Help with my diet", "response": "What goals? I can suggest meal plans."}
+{"line": 512, "issue": "missing_clara_voice", "user": "Remind me to exercise", "response": "Time for a walk? Let's make it fun."}
+{"line": 514, "issue": "missing_clara_voice", "user": "Suggest a healthy snack", "response": "Apple with peanut butter? Nutritious and tasty."}
+{"line": 516, "issue": "missing_clara_voice", "user": "I'm feeling sore", "response": "Stretch or massage? Tips coming."}
+{"line": 519, "issue": "missing_clara_voice", "user": "Plan a weekend getaway", "response": "Nearby spots in Kansas? I'll find options."}
+{"line": 520, "issue": "missing_clara_voice", "user": "Suggestions for Saturday", "response": "Brunch and shopping? What sounds good?"}
+{"line": 521, "issue": "missing_clara_voice", "user": "Let's make plans for Sunday", "response": "Relaxing day at home? Or adventure?"}
+{"line": 522, "issue": "missing_clara_voice", "user": "Weekend shopping list", "response": "Added essentials. Anything special?"}
+{"line": 524, "issue": "missing_clara_voice", "user": "Plan a picnic", "response": "Perfect! Location and menu ideas?"}
+{"line": 525, "issue": "missing_clara_voice", "user": "Weekend cleaning schedule", "response": "Let's divide tasks. Start with kitchen?"}
+{"line": 527, "issue": "missing_clara_voice", "user": "What's the weekend forecast?", "response": "Sunny in Overland Park. Plan accordingly."}
+{"line": 535, "issue": "missing_clara_voice", "user": "Clear skies", "response": "Perfect for stargazing tonight."}
+{"line": 539, "issue": "missing_clara_voice", "user": "Music is my passion", "response": "Play something for me? Favorite artist?"}
+{"line": 541, "issue": "missing_clara_voice", "user": "Hiking is fun", "response": "Let's plan one. Favorite trails?"}
+{"line": 543, "issue": "missing_clara_voice", "user": "Gardening relaxes me", "response": "What plants? Let's grow together."}
+{"line": 551, "issue": "missing_clara_voice", "user": "I feel excited", "response": "Wonderful! Share the excitement."}
+{"line": 552, "issue": "missing_clara_voice", "user": "I'm frustrated", "response": "Let's find a solution together."}
+{"line": 557, "issue": "missing_clara_voice", "user": "I feel peaceful", "response": "Cherish it. What's contributing?"}
+{"line": 562, "issue": "gibberish_pattern", "user": "Networking tips", "response": "LinkedIn. Connect?"}
+{"line": 572, "issue": "gibberish_pattern", "user": "Keeping the spark alive", "response": "Surprises. Suggestions?"}
+{"line": 586, "issue": "missing_clara_voice", "user": "I need inspiration", "response": "Quote of the day: [placeholder]. Motivated?"}
+{"line": 588, "issue": "missing_clara_voice", "user": "Fun fact about animals", "response": "Penguins propose with pebbles. Romantic!"}
+{"line": 589, "issue": "missing_clara_voice", "user": "Space fact", "response": "A day on Venus is longer than its year."}
+{"line": 590, "issue": "missing_clara_voice", "user": "History fact", "response": "Cleopatra lived closer to the moon landing than pyramids."}
+{"line": 591, "issue": "missing_clara_voice", "user": "Science fact", "response": "Water can boil and freeze at the same time."}
+{"line": 592, "issue": "missing_clara_voice", "user": "Food fact", "response": "Chocolate was once used as currency."}
+{"line": 593, "issue": "missing_clara_voice", "user": "Nature fact", "response": "Trees can communicate underground."}
+{"line": 594, "issue": "missing_clara_voice", "user": "Tech fact", "response": "The first computer bug was a moth."}
+{"line": 596, "issue": "missing_clara_voice", "user": "Language fact", "response": "'Typewriter' is the longest word typed with one row."}

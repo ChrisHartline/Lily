@@ -56,7 +56,7 @@ MEMORY_CONFIG = {
     "falkor_username": os.environ.get("FALKOR_USERNAME", ""),
     "falkor_password": os.environ.get("FALKOR_PASSWORD", ""),
     "falkor_ssl": os.environ.get("FALKOR_SSL", "false").lower() == "true",
-    "hdc_dimensions": int(os.environ.get("HDC_DIMENSIONS", "64000")),
+    "hdc_dimensions": int(os.environ.get("HDC_DIMENSIONS", "10000")),  # Reduced for speed
     "enable_memory": os.environ.get("ENABLE_MEMORY", "true").lower() == "true",
 }
 
@@ -98,7 +98,7 @@ def download_models():
 # Create the Modal image with all dependencies
 image = (
     Image.debian_slim(python_version="3.11")
-    .env({"IMAGE_VERSION": "6"})  # Cache buster - increment to force rebuild
+    .env({"IMAGE_VERSION": "8"})  # Cache buster - increment to force rebuild
     .pip_install(
         # API
         "fastapi>=0.109.0",
@@ -106,9 +106,9 @@ image = (
         "websockets>=12.0",
         "pydantic>=2.0.0",
 
-        # ML/AI
+        # ML/AI - use sdpa attention instead of flash-attn (no compile needed)
         "torch>=2.1.0",
-        "transformers>=4.44.0",  # Phi-3 requires 4.44+ for DynamicCache fix
+        "transformers==4.46.0",  # Pin version - Phi-3 DynamicCache fix
         "accelerate>=0.25.0",
         "bitsandbytes>=0.41.0",
         "peft>=0.7.0",  # For LoRA
@@ -147,7 +147,7 @@ image = image.add_local_dir(
 
 @app.cls(
     image=image,
-    gpu="T4",  # Start with T4, upgrade to A10G if needed
+    gpu="A10G",  # Upgraded from T4 for faster inference (~2-3x)
     timeout=600,
     scaledown_window=300,
     secrets=[
@@ -201,6 +201,7 @@ class ClaraModel:
                 device_map="auto",
                 trust_remote_code=True,
                 load_in_4bit=True,  # Quantize to fit in GPU memory
+                attn_implementation="sdpa",  # Use PyTorch's SDPA (faster than eager)
             )
             print("[Clara] ✓ Knowledge brain loaded")
         else:
@@ -323,6 +324,7 @@ class ClaraModel:
     def chat(self, message: str, personality: str = "warmth") -> dict:
         """Generate a response to a message"""
         import torch
+        import time
 
         if self.knowledge_model is None:
             return {
@@ -331,29 +333,39 @@ class ClaraModel:
             }
 
         try:
+            t0 = time.time()
+            
             # Route the message (simple keyword-based for MVP)
             routing = self.route_message(message)
+            t1 = time.time()
+            print(f"[Timing] Routing: {t1-t0:.2f}s")
 
             # Detect triggered personality modules
             triggered_modules = self._detect_triggered_modules(message)
+            t2 = time.time()
+            print(f"[Timing] Module detection: {t2-t1:.2f}s")
 
             # Recall relevant memories
             memory_context = ""
             recalled_memories = []
-            if self.memory_enabled and self.memory:
+            if self.memory_enabled and self.memory and len(message) > 10:
                 try:
                     memory_context = self.memory.get_context_for_prompt(
                         message,
-                        max_memories=5,
-                        max_tokens=800
+                        max_memories=3,  # Reduced from 5
+                        max_tokens=400   # Reduced from 800
                     )
-                    result = self.memory.recall(message, top_k=3)
+                    result = self.memory.recall(message, top_k=2)  # Reduced from 3
                     recalled_memories = [m.id for m in result.memories]
                 except Exception as e:
                     print(f"[Clara] Memory recall failed: {e}")
+            t3 = time.time()
+            print(f"[Timing] Memory recall: {t3-t2:.2f}s")
 
             # Format prompt (includes triggered modules and memory)
             prompt = self.format_prompt(message, personality, memory_context)
+            t4 = time.time()
+            print(f"[Timing] Prompt build: {t4-t3:.2f}s")
 
             # Tokenize
             inputs = self.knowledge_tokenizer(
@@ -362,24 +374,31 @@ class ClaraModel:
                 truncation=True,
                 max_length=2048
             ).to(self.knowledge_model.device)
+            t5 = time.time()
+            print(f"[Timing] Tokenize: {t5-t4:.2f}s | Tokens: {inputs['input_ids'].shape[1]}")
 
-            # Generate (reduced tokens for faster response)
+            # Generate (optimized for speed)
             with torch.no_grad():
                 outputs = self.knowledge_model.generate(
                     **inputs,
-                    max_new_tokens=128,  # Reduced from 512 for faster responses
+                    max_new_tokens=100,
                     temperature=0.7,
                     top_p=0.9,
                     do_sample=True,
-                    use_cache=False,  # Disable cache to avoid Phi-3 DynamicCache issues
+                    use_cache=False,
+                    past_key_values=None,  # Explicit None to prevent DynamicCache
                     pad_token_id=self.knowledge_tokenizer.eos_token_id,
                 )
+            t6 = time.time()
+            print(f"[Timing] Generation: {t6-t5:.2f}s | Output tokens: {outputs.shape[1] - inputs['input_ids'].shape[1]}")
 
             # Decode
             response = self.knowledge_tokenizer.decode(
                 outputs[0][inputs['input_ids'].shape[1]:],
                 skip_special_tokens=True
             )
+            t7 = time.time()
+            print(f"[Timing] Total: {t7-t0:.2f}s")
 
             response_text = response.strip()
 
